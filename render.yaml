@@ -3,7 +3,7 @@ services:
     name: ept-task-manager
     plan: free
     branch: main
-    buildCommand: "./mvnw clean package"
+    buildCommand: "mvn clean package"
     startCommand: "java -jar target/*.jar"
     envVars:
       - key: GOOGLE_SHEET_USERID
