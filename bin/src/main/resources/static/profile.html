@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #dedbfa;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #1e40af;
+    }
+
+    .container {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .profile-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 393px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      font-size: smaller;
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-header i {
+      font-size: 50px;
+      color: #5ea320;
+      margin-bottom: 10px;
+    }
+
+    .profile-details label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .profile-details p {
+      margin: 5px 0 15px;
+      color: #333;
+    }
+
+    .profile-details i{
+    color: #da0d14;
+    margin-right: 6px;
+}
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #fff;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #ccc;
+      padding: 10px 0;
+    }
+
+    .bottom-nav a {
+      text-align: center;
+      color: #333;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .bottom-nav i {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .bottom-nav a:hover {
+      color: #007bff;
+      transform: scale(1.1);
+    }
+    
+   @media screen and (max-width: 480px) {
+  .profile-card {
+    width: 90%;
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .profile-header i {
+    font-size: 40px;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.8rem 1rem;
+  }
+
+  header h2 {
+    font-size: 1rem;
+    margin-top: 8px;
+  }
+
+  .bottom-nav a {
+    font-size: 11px;
+  }
+
+  .bottom-nav i {
+    font-size: 16px;
+  }
+} 
+    
+  </style>
+</head>
+<body>
+
+<header>
+  <a id="backLink" href="#" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
+    <i class="fa-solid fa-arrow-left"></i>
+  </a>
+  <h2><i class="fa-solid fa-user-circle"></i> User Profile</h2>
+</header>
+
+<div class="container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <i class="fa-solid fa-user-circle"></i>
+      <h3>Loading...</h3>
+    </div>
+
+    <div class="profile-details">
+      <label><i class="fa-solid fa-envelope"></i> Email:</label>
+      <p>-</p>
+
+      <label><i class="fa-solid fa-user-tie"></i> Position:</label>
+      <p>-</p>
+
+      <label><i class="fa-solid fa-building"></i> Department:</label>
+      <p>-</p>
+
+      <label><i class="fa-solid fa-phone"></i> Phone:</label>
+      <p>-</p>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const email = localStorage.getItem("EmpEmail");
+
+    if (!email) {
+      alert("No email found in localStorage.");
+      return;
+    }
+
+    fetch(`/api/users/by-email/${encodeURIComponent(email)}`)
+      .then(response => {
+        if (!response.ok) throw new Error("User not found");
+        return response.json();
+      })
+      .then(user => {
+        document.querySelector(".profile-header h3").textContent = user.email || "User";
+
+        document.querySelector(".profile-details").innerHTML = `
+          <label><i class="fa-solid fa-envelope"></i> Email:</label>
+          <p>${user.email || "-"}</p>
+
+          <label><i class="fa-solid fa-user-tie"></i> Position:</label>
+          <p>${user.role || "-"}</p>
+
+          <label><i class="fa-solid fa-building"></i> Department:</label>
+          <p>${user.department || "-"}</p>
+
+          <label><i class="fa-solid fa-phone"></i> Phone:</label>
+          <p>${user.mobileNumber || "-"}</p>
+        `;
+
+        const role = user.role?.toLowerCase() || "employee";
+        const bottomNav = document.querySelector(".bottom-nav");
+
+        const backHref = localStorage.getItem("EmpRole") === "manager"
+          ? "/dashboard/manager"
+          : "/dashboard/employee";
+        document.getElementById("backLink").href = backHref;
+
+        let homeLink = localStorage.getItem("EmpRole") === "manager" ? "managerDashboard.html" : "employeeDashboard.html";
+        let graphLink = localStorage.getItem("EmpRole") === "manager" ? "managerPerform.html" : "performanceDashboard.html";
+
+       
+      })
+      .catch(error => {
+        console.error("Error loading user:", error);
+      });
+  });
+</script>
+
+</body>
+</html>

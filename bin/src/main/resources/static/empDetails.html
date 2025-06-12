@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employees_Data</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 1.2rem 2rem 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ededed;
+    }
+
+    header h2 {
+      margin: 0;
+      color: #222;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .settings-icons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .settings-icons i {
+      color: #e74c3c;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      background: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0 40px;
+    }
+
+    .title-section {
+      margin-bottom: 1.5rem;
+    }
+    .title-section h1 {
+      margin: 0 0 1rem 0;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #222;
+    }
+    .title-section .page-index {
+      display: inline-block;
+      background-color: #e74c3c;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 4px;
+      padding: 3px 12px;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 28px 36px;
+    }
+
+    .user-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(30,64,175,0.05);
+      padding: 26px 24px 22px 24px;
+      display: flex;
+      gap: 22px;
+      align-items: flex-start;
+      min-width: 320px;
+      min-height: 160px;
+    }
+
+    .user-avatar {
+      font-size: 3.1rem;
+      color: #5ea320;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .user-name {
+      font-weight: bold;
+      font-size: 1.13rem;
+      color: #222;
+      margin-right: 5px;
+      text-transform: uppercase;
+    }
+    .user-dept {
+      color: #e74c3c;
+      font-size: 1.05rem;
+      font-weight: 500;
+      margin-left: 3px;
+    }
+
+    .user-contact {
+      margin-top: 5px;
+    }
+
+    .user-contact .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #1e40af;
+      margin-bottom: 3px;
+      font-size: 1rem;
+    }
+
+    .user-contact .contact-row i {
+      min-width: 18px;
+      color: #da0d14;
+    }
+
+    .user-contact .contact-row .fa-users {
+      color: #6c2eb6;
+    }
+
+    @media (max-width: 900px) {
+      .users-grid {
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+      .container {
+        padding: 0 8px;
+      }
+    }
+    @media (max-width: 650px) {
+      .user-card {
+        flex-direction: column;
+        align-items: flex-start;
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Global Header -->
+ <header style="background-color: #eae6ff;padding: 1rem;display: flex;justify-content: space-between;align-items: center;margin-top: -0.9rem;margin-left: 0rem;width: 83rem;">
+  <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <a href="/dashboard/manager" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <i class="fas fa-users" style="color: #1e40af; font-size: 1.2rem;"></i>
+    <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Employees Data</h2>
+  </div>
+  
+    <div style="display: flex; align-items: center; gap: 1rem; position: relative;">
+      <!-- Dark Mode & Monochrome Toggles -->
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <!-- Dark Mode Toggle -->
+        <label title="Toggle Dark Mode" style="cursor: pointer;">
+          <input type="checkbox" id="darkModeToggle" style="display:none;" />
+          <i class="fa-solid fa-moon" id="darkModeIcon" style="color: #d5cf1d;"></i>
+        </label>
+      </div>
+ 
+      <!-- Notification Icon & Dropdown -->
+<a href="javascript:void(0);" id="notificationIcon" title="Notifications" style="color: #1e40af; font-size: 1.4rem; position: relative;">
+  <i class="fa-solid fa-bell"></i>
+  <span class="notification-badge" id="notificationCount" style="display:none;">0</span>
+</a>
+<div class="notification-dropdown" id="notificationDropdown" style="display:none;">
+  <div class="notification-dropdown-header">Notifications</div>
+  <ul class="notification-list" id="notificationList">
+    <!-- JS will populate -->
+  </ul>
+  <div class="notification-dropdown-empty" id="notificationEmpty" style="display:none;">
+    <i class="fa-regular fa-bell"></i> No new notifications.
+  </div>
+</div>
+
+<!-- Profile Icon & Dropdown -->
+
+<div class="profile-container" style="position: relative; display:inline-block;">
+  <i class="fas fa-user profile-icon" id="profileIcon" style="font-size:1.4rem; color:#1e40af; cursor:pointer;"></i>
+  <div class="dropdown" id="profileDropdown" style="display:none; position:absolute; right:0; top:110%;">
+    <a href="/profile"><i class="fas fa-id-badge"></i>Profile</a>
+    <a href="/employee/profile"><i class="fas fa-users"></i>Employee Profile</a>
+    <a href="/login" onclick="localStorage.clear();"><i class="fas fa-power-off"></i> Logout</a>
+  </div>
+</div>
+    </div>
+  </header>
+
+<div class="container">
+  <div class="title-section">
+    <span class="page-index">1</span>
+  </div>
+  <div class="users-grid" id="usersGrid">
+    <!-- User cards will be injected here by JavaScript -->
+  </div>
+</div>
+
+<script>
+
+// Helper to render info or fallback
+function show(val) {
+  return val ? val : "Not Available";
+}
+
+function userCard(user) {
+  return `
+    <div class="user-card">
+      <div class="user-avatar">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <div class="user-info">
+        <div class="user-row">
+          <span class="user-name">${user.name}</span>
+          <span class="user-dept">${user.department}</span>
+        </div>
+        <div class="user-contact">
+          <div class="contact-row">
+            <i class="fas fa-envelope"></i>
+            ${show(user.email)}
+          </div>
+          <div class="contact-row">
+            <i class="fas fa-phone"></i>
+            ${show(user.mobileNumber)}
+          </div>
+          <div class="contact-row">
+            <i class="fas fa-id-badge"></i>
+            ${show(user.reportingto)}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Fetch users from backend
+document.addEventListener("DOMContentLoaded", function () {
+  const usersGrid = document.getElementById("usersGrid");
+  fetch("/api/manager/allUsers")
+    .then(response => {
+      if (!response.ok) throw new Error("Failed to fetch users");
+      return response.json();
+    })
+    .then(users => {
+      usersGrid.innerHTML = users.map(userCard).join('');
+    })
+    .catch(error => {
+      usersGrid.innerHTML = `<p style="color:red;">Error loading users: ${error.message}</p>`;
+      console.error("Error fetching user data:", error);
+    });
+});
+</script>
+
+
+</body>
+</html>

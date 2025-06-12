@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <title>Manager_DHome_Page</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f7f9fc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .layout {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      background-color: #fff;
+      width: 240px;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+      display: none;
+      flex-shrink: 0;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      margin: 15px 0;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: 500;
+    }
+
+    /* Main content area */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .tasks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .task-card {
+      background: #fff;
+      border-left: 6px solid #007bff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 18rem;
+    }
+
+    .task-card.green { border-color: green; }
+    .task-card.orange { border-color: orange; }
+    .task-card.red { border-color: red; }
+    .task-card.yellow { border-color: yellow;
+     }
+     
+    .progress-section,
+    .chart-section {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar-inner {
+      background: #007bff;
+      height: 10px;
+      width: 71.1%;
+    }
+
+    #taskChart {
+      max-width: 140px;
+      max-height: 140px;
+      width: 100%;
+      height: auto;
+      margin: auto;
+      display: block;
+    }
+
+    /* Bottom nav for mobile */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #fff;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #ccc;
+      padding: 10px 0;
+    }
+
+    .bottom-nav a {
+      text-align: center;
+      color: #333;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .bottom-nav i {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .bottom-nav a:hover {
+      color: #007bff;
+      transform: scale(1.1);
+    }
+
+    /* Graph Icon Animation */
+    .graph-icon {
+      display: flex;
+      gap: 4px;
+      height: 20px;
+      margin-bottom: 4px;
+    }
+
+    .graph-icon .bar {
+      width: 4px;
+      background: #007bff;
+      border-radius: 2px;
+      animation: barWave 1s infinite ease-in-out;
+    }
+
+    .bar1 {
+      animation-delay: 0s;
+    }
+    .bar2 {
+      animation-delay: 0.5s;
+    }
+    .bar3 {
+      animation-delay: 1s;
+    }
+
+    @keyframes barWave {
+      0% { height: 5px; }
+      25% { height: 20px; }
+      50% { height: 5px; }
+      75% { height: 20px; }
+      100% { height: 5px; }
+    }
+
+    /* Show sidebar on large screens */
+    .main-content {
+      padding: 20px;
+      padding-bottom: 70px; /* So bottom-nav doesn't overlap content */
+    }
+
+    /* Mobile menu button */
+    .menu-btn {
+      display: inline-block;
+      background: none;
+      border: none;
+      font-size: 24px;
+      margin-right: 15px;
+    }
+
+    /* Mobile sidebar overlay */
+    .sidebar-mobile {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 240px;
+      height: 100%;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-mobile.active {
+      left: 0;
+    }
+
+    @media (max-width: 991px) {
+      .sidebar {
+        display: none;
+      }
+
+      .bottom-nav {
+        display: flex;
+      }
+    }
+
+    .summary-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .progress-section,
+    .chart-section {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      flex: 1;
+    }
+
+    /* Show side by side on wider screens */
+    @media (min-width: 768px) {
+      .summary-section {
+        flex-direction: row;
+      }
+    }
+
+    header {
+      background-color: #dedbfa;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    header a {
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 10px 20px;
+      background-color: #f6f8fb;
+    }
+
+    .dashboard-header h2 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .header-buttons-horizontal {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .header-buttons-horizontal button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: #2962ff;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-outline {
+      background-color: #fff;
+      color: #000;
+      border: 1px solid #ccc;
+    }
+
+    /* Responsive layout for mobile */
+    @media (max-width: 600px) {
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-buttons-horizontal {
+        margin-top: 10px;
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .header-buttons-horizontal button {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .popup-form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 53rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .popup-form h3 {
+      margin-top: 0;
+    }
+
+    .popup-form input,
+    .popup-form select,
+    .popup-form textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .popup-buttons button {
+      flex: 1;
+    }
+
+    .card {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 16px;
+      background-color: white;
+      max-width: 400px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      margin: auto;
+      font-family: Arial, sans-serif;
+    }
+
+    .card h3 {
+      margin-bottom: 12px;
+      font-size: 16px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .team-progress .team-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .team-row span {
+      flex: 1 1 100px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .percent {
+      width: 40px;
+      text-align: right;
+      font-size: 13px;
+    }
+
+    .progress-bar {
+      flex: 1 1 auto;
+      height: 8px;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    .fill.blue {
+      background-color: #1e90ff;
+    }
+
+    .fill.orange {
+      background-color: #ffa500;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .card {
+        padding: 12px;
+      }
+
+      .team-progress .team-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .progress-bar {
+        width: 100%;
+        margin: 4px 0;
+      }
+
+      .percent {
+        align-self: flex-end;
+      }
+    }
+
+    .row-cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      margin-top: 20px;
+    }
+
+    .row-cards .task-card.orange {
+      flex: 0 0 200px;
+      min-width: 160px;
+    }
+
+    .row-cards .card {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .row-cards .card,
+    .row-cards .task-card.orange {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 600px) {
+      .row-cards {
+        flex-direction: column;
+      }
+
+      .row-cards .task-card.orange,
+      .row-cards .card {
+        flex: 1 1 100%;
+      }
+    }
+
+    body, html {
+      background: #f6f8fb;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Desktop row flex layout */
+    .dashboard-row {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 5vw;
+      margin: 24px 0 0 0;
+      width: 100%;
+    }
+
+    /* Overdue Stat Card */
+    .stat-card.stat-overdue {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(40,60,80,0.06);
+      padding: 32px 24px 20px 24px;
+      min-width: 220px;
+      min-height: 150px;
+      text-align: left;
+      margin-left: 12px;
+    }
+    .stat-number {
+      font-size: 2em;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .stat-desc {
+      font-size: 1.1em;
+      color: #222;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .icon-hourglass {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+    }
+
+    /* Completion Card (right side) */
+    .completion-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(40,60,80,0.08);
+      padding: 24px 30px 18px 30px;
+      min-width: 370px;
+      min-height: 200px;
+      margin-left: -41px;
+      flex: 1.5;
+    }
+    .completion-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      color: #444;
+    }
+    .completion-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .completion-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .team-name {
+      flex: 2;
+      font-weight: 600;
+      color: #222;
+      font-size: 1.03em;
+    }
+    .completion-bar {
+      background: #e0e0e0;
+      border-radius: 8px;
+      width: 110px;
+      height: 10px;
+      position: relative;
+      margin: 0 8px;
+      flex: 2.2;
+      overflow: hidden;
+    }
+    .bar-inner {
+      height: 100%;
+      border-radius: 8px;
+      background: #2196f3;
+      transition: width 0.5s;
+    }
+    .bar-inner.goal {
+      background: #ffb300;
+    }
+    .percent {
+      flex: 1;
+      font-weight: 700;
+      color: #222;
+      text-align: right;
+    }
+
+    /* Responsive: on mobile switch to column */
+    @media (max-width: 900px) {
+      .dashboard-row {
+        flex-direction: column;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stat-card.stat-overdue,
+      .completion-card {
+        min-width: 0;
+        margin: 0 auto 0 auto;
+        width: 96vw;
+        box-sizing: border-box;
+      }
+      .completion-card { padding: 18px 8vw 12px 8vw; }
+    }
+
+    /* Layout rows with 2 columns */
+    .form-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+      }
+    }
+
+    .popup-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* Each form group (label + input) */
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Full width for fields like Remarks */
+    .form-group.full-width {
+      flex: 1 1 100%;
+    }
+
+    /* Inputs, selects, textareas styles */
+    input, select, textarea {
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+
+    /* Labels */
+    label {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    /* Button styles */
+    .popup-buttons {
+      display: flex;
+      justify-content: flex-start;
+      gap: 15px;
+      margin-top: 20px;
+      width: 0rem;
+      margin-left: 10rem;
+    }
+
+    .btn-submit, .btn-back {
+      padding: 5px 70px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-submit {
+      background-color: #e53935;
+      color: #fff;
+    }
+
+    .btn-back {
+      background-color: #424242;
+      color: #fff;
+    }
+
+    /* Responsive tweak for small screens */
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column;
+      }
+    }
+
+    /* Notification Dropdown Styles */
+    .notification-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 38px;
+      background: #fff;
+      min-width: 260px;
+      max-width: 320px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.23);
+      border-radius: 10px;
+      z-index: 2000;
+      overflow: hidden;
+      animation: fadeIn 0.18s;
+    }
+    .notification-dropdown.visible {
+      display: block;
+    }
+    .notification-dropdown-header {
+      padding: 1rem 1.2rem 0.7rem 1.2rem;
+      border-bottom: 1px solid #eee;
+      font-weight: bold;
+      background: #f0f4ff;
+    }
+    .notification-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .notification-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      padding: 0.8rem 1.2rem;
+      border-bottom: 1px solid #f6f6f6;
+      font-size: 0.97rem;
+      background: #fff;
+      transition: background 0.12s;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background: #f4f8ff;
+      font-weight: 600;
+    }
+    .notification-item i {
+      color: #1e40af;
+      font-size: 1.1rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .notification-time {
+      display: block;
+      font-size: 0.82em;
+      color: #888;
+      margin-top: 2px;
+    }
+    .notification-dropdown-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #888;
+      font-size: 0.98em;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    /* Notification bell badge */
+    .notification-badge {
+      position: absolute;
+      top: 1px;
+      right: 3px;
+      background: #e53935;
+      color: white;
+      font-size: 10px;
+      border-radius: 50%;
+      padding: 2px 6px;
+      line-height: 1;
+      min-width: 17px;
+      text-align: center;
+      font-weight: bold;
+      border: 2px solid #fff;
+      pointer-events: none;
+    }
+	
+    /* DARK MODE */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    body.dark-mode header {
+      background-color: #1f1f1f;
+    }
+    body.dark-mode .task-card,
+    body.dark-mode .progress-section,
+    body.dark-mode .chart-section,
+    body.dark-mode .popup-form,
+    body.dark-mode .notification-dropdown {
+      background-color: #2c2c2c;
+      color: #f1f1f1;
+    }
+    body.dark-mode .bottom-nav {
+      background-color: #1a1a1a;
+    }
+    body.dark-mode .btn-primary {
+      background-color: #1565c0;
+    }
+    body.dark-mode .btn-outline {
+      background-color: #1f1f1f;
+      color: #fff;
+      border-color: #444;
+    }
+
+    /* MONOCHROME MODE */
+    body.monochrome-mode * {
+      filter: grayscale(100%) !important;
+    }
+	
+    /* Hover effect for completion card */
+    .completion-card {
+      transition: box-shadow 0.18s, transform 0.18s;
+      cursor: pointer;
+    }
+    .completion-card:hover {
+      box-shadow: 0 6px 18px rgba(30,64,175,0.14), 0 1.5px 5px rgba(0,0,0,0.07);
+      transform: translateY(-6px) scale(1.02);
+      z-index: 2;
+    }
+
+    /* Dark mode for completion card */
+    body.dark-mode .completion-card {
+      background-color: #2c2c2c;
+      color: #f1f1f1;
+    }
+
+    /* Monochrome mode for completion card */
+    body.monochrome-mode .completion-card {
+      filter: grayscale(100%) !important;
+    }
+	
+    .suggestions-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .suggestions-dropdown div {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .suggestions-dropdown div:hover {
+      background-color: #f0f0f0;
+    }
+
+    .profile-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-icon {
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 30px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+      min-width: 150px;
+    }
+
+    .dropdown a {
+      display: block;
+      padding: 10px;
+      color: #1e40af;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .dropdown a:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .toast {
+      position: relative;
+      min-width: 250px;
+      max-width: 350px;
+      background-color: white;
+      color: #333;
+      padding: 12px 40px 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      animation: fadeInOut 5s forwards;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      border-left: 4px solid transparent;
+    }
+
+    .toast.success {
+      border-left-color: #4caf50;
+    }
+
+    .toast.error {
+      border-left-color: #f44336;
+    }
+
+    .toast.info {
+      border-left-color: #2196f3;
+    }
+
+    .toast-title {
+      font-weight: bold;
+      margin-bottom: 2px;
+      color: #333;
+    }
+
+    .toast-message {
+      color: #666;
+    }
+
+    .toast-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast-container" class="toast-container"></div>
+  <!-- Global Header -->
+  <header style="background-color: #eae6ff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0.1rem; position: relative;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <i class="fa-solid fa-user-tie" style="color: #1e40af; font-size: 1.2rem;"></i>
+      <span id="loggedInEmail" style="font-weight: normal;"></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem; position: relative;">
+      <!-- Dark Mode & Monochrome Toggles -->
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <!-- Dark Mode Toggle -->
+        <label title="Toggle Dark Mode" style="cursor: pointer;">
+          <input type="checkbox" id="darkModeToggle" style="display:none;" />
+          <i class="fa-solid fa-moon" id="darkModeIcon" style="color: #d5cf1d;"></i>
+        </label>
+      </div>
+      <!-- Notification Icon -->
+      <a href="javascript:void(0);" id="notificationIcon" title="Notifications" style="color: #1e40af; font-size: 1.4rem; position: relative;">
+        <i class="fa-solid fa-bell"></i>
+        <span class="notification-badge" id="notificationCount"></span>
+      </a>
+      <!-- Notification Dropdown -->
+      <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-dropdown-header">Notifications</div>
+        <ul class="notification-list" id="notificationList">
+          <!-- JS will populate -->
+        </ul>
+        <div class="notification-dropdown-empty" id="notificationEmpty" style="display:none;">
+          <i class="fa-regular fa-bell"></i> No new notifications.
+        </div>
+      </div>
+      <div class="profile-container">
+        <i class="fas fa-user profile-icon" onclick="toggleDropdown()"></i>
+        <div class="dropdown" id="profileDropdown">
+          <a href="/profile"><i class="fas fa-id-badge"></i> Profile</a>
+          <a href="/emplsDetails"><i class="fas fa-users"></i>Employees</a>
+          <a href="/login" onclick="localStorage.clear();"><i class="fas fa-power-off"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout for Web -->
+  <main class="main-content">
+    <div class="dashboard-header" style="display: flex; justify-content: flex-end;">
+      <div class="header-buttons-horizontal" style="display: flex; gap: 0.5rem;">
+        <!-- Add Task Button -->
+        <button class="btn-primary" onclick="openTaskPopup()">
+          <i class="fa-solid fa-plus" style="margin-right: 5px;"></i>
+          Add Task
+        </button>
+        <!-- View All Tasks -->
+        <a href="/taskListView">
+          <button>
+            <i class="fa-solid fa-clipboard-list" style="margin-right: 5px;"></i>
+            View All Tasks
+          </button>
+        </a>
+        <!-- View StoryPoints -->
+        <a href="/storypoints">
+          <button>
+            <i class="fa-solid fa-clipboard-list" style="margin-right: 5px;"></i>
+            View StoryPoints
+          </button>
+        </a>
+        <!-- Performance Dashboard -->
+        <a href="/Pdashboard">
+          <button class="btn-outline">
+            <i class="fa-solid fa-chart-line" style="margin-right: 5px;"></i>
+            Performance Dashboard
+          </button>
+        </a>
+      </div>
+    </div>
+
+    <div class="tasks">
+      <div class="task-card">
+        <h3 id="totalTasks">0</h3>
+        <i class="fa-solid fa-clipboard-check fa-bounce"></i> Team Tasks
+      </div>
+      <div class="task-card green">
+        <h3 id="completedTasks">0</h3>
+        <i class="fas fa-check fa-bounce"></i> Completed Tasks
+      </div>
+      <div class="task-card orange">
+        <h3 id="InProgressTasks">0</h3>
+        <i class="fas fa-clock fa-spin"></i> In Progress
+      </div>
+      <div class="task-card red">
+        <h3 id="notStartedTasks">0</h3>
+        <i class="fas fa-hourglass-half fa-spin"></i> Not Started
+      </div>    
+    </div>
+
+    <div class="dashboard-row">
+      <div class="task-card yellow">
+        <h3 id="OverDueTasks">0</h3>
+        <i class="fas fa-hourglass-end fa-bounce"></i> Overdue
+      </div>
+      <div class="completion-card">
+        <h6 class="completion-title">Team Task Completion</h6>
+        <div class="completion-list">
+          <!-- Dynamically populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Task Popup Form -->
+  <div id="addTaskPopup" class="popup-overlay" style="display: none;">
+    <div class="popup-form">
+      <h3>Add New Task</h3>
+      <form id="taskForm">
+        <!-- Row 1: Description, Area, Sub-Area -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" placeholder="Enter description" required>
+          </div>
+          <div class="form-group">
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+              <option value="">Select Department</option>
+              <option value="IT"> IT </option>
+              <option value="SAP"> SAP </option>
+              <option value="FINANCE"> FINANCE </option>
+              <option value="HR"> HR </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="area">Area:</label>
+            <input type="text" id="area" name="area" placeholder="Enter area" required>
+          </div>
+        </div>
+        <!-- Row 2: Person, Start-Date, End-Date -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="sub_area">Sub-Area:</label>
+            <input type="text" id="sub_area" name="sub_area" placeholder="Enter sub-area" required>
+          </div>
+          <div class="form-group" style="position: relative;">
+            <label for="person">Person:</label>
+            <input type="text" id="person" name="person" placeholder="Search by name" autocomplete="off" required>
+            <div id="person-suggestions" class="suggestions-dropdown"></div>
+          </div>
+          <div class="form-group">
+            <label for="start_date">Start-Date:</label>
+            <input type="date" id="start_date" name="start_date" required>
+          </div>
+        </div>
+        <!-- Row 3: Status, Priority, Remarks -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="end_date">End-Date:</label>
+            <input type="date" id="end_date" name="end_date" required>
+          </div>
+          <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+              <option value="">Select Status</option>
+              <option>Not Started</option>
+              <option>In Progress</option>
+              <option>Completed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="priority">Priority:</label>
+            <select id="priority" name="priority" required>
+              <option value="">Select Priority</option>
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+          </div>
+        </div>
+        <!-- Row 4: Status, Priority, Remarks -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="remarks">Remarks:</label>
+            <textarea id="remarks" name="remarks" placeholder="Additional remarks" rows="3"></textarea>
+          </div>
+        </div>
+        <!-- Buttons -->
+        <div class="popup-buttons">
+          <button type="submit" class="btn-submit" onclick="submitTask(event)">Submit</button>
+          <button type="button" class="btn-back" onclick="closeTaskPopup()">« Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Toast notification function
+    function showToast(type, title, message) {
+      const toastContainer = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      const toastTitle = document.createElement("div");
+      toastTitle.className = "toast-title";
+      toastTitle.textContent = title;
+      const toastMessage = document.createElement("div");
+      toastMessage.className = "toast-message";
+      toastMessage.textContent = message;
+      const closeButton = document.createElement("button");
+      closeButton.className = "toast-close";
+      closeButton.textContent = "×";
+      closeButton.onclick = () => {
+        toast.style.animation = "none";
+        toast.remove();
+      };
+      toast.appendChild(toastTitle);
+      toast.appendChild(toastMessage);
+      toast.appendChild(closeButton);
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 5000);
+    }
+
+    // Notification logic
+    const notifications = [
+      {
+        icon: "fa-clipboard-check",
+        message: "You have 3 approvals to review.",
+        time: "Just now",
+        unread: true
+      },
+      {
+        icon: "fa-user-plus",
+        message: "New task assigned.",
+        time: "15 min ago",
+        unread: true
+      },
+      {
+        icon: "fa-check-circle",
+        message: "pending task is not completed.",
+        time: "1 hour ago",
+        unread: false
+      }
+    ];
+
+    function renderNotifications() {
+      const list = document.getElementById("notificationList");
+      const badge = document.getElementById("notificationCount");
+      const empty = document.getElementById("notificationEmpty");
+      list.innerHTML = "";
+      let unreadCount = notifications.filter(n => n.unread).length;
+      badge.textContent = unreadCount > 0 ? unreadCount : "";
+      badge.style.display = unreadCount > 0 ? "block" : "none";
+      if (notifications.length === 0) {
+        empty.style.display = "";
+        list.style.display = "none";
+      } else {
+        empty.style.display = "none";
+        list.style.display = "";
+        notifications.forEach(n => {
+          const li = document.createElement("li");
+          li.className = "notification-item" + (n.unread ? " unread" : "");
+          li.innerHTML = `<i class="fa-solid ${n.icon}"></i>
+            <span>
+              ${n.message}
+              <span class="notification-time">${n.time}</span>
+            </span>`;
+          list.appendChild(li);
+        });
+      }
+    }
+
+    // Show/hide notification dropdown
+    const notificationIcon = document.getElementById("notificationIcon");
+    const notificationDropdown = document.getElementById("notificationDropdown");
+    let dropdownOpen = false;
+    notificationIcon.addEventListener("click", function(e) {
+      e.stopPropagation();
+      dropdownOpen = !dropdownOpen;
+      notificationDropdown.classList.toggle("visible", dropdownOpen);
+      if (dropdownOpen) {
+        notifications.forEach(n => n.unread = false);
+        renderNotifications();
+      }
+    });
+
+    // Close on click outside
+    window.addEventListener("click", function(e) {
+      if (dropdownOpen &&
+          !notificationDropdown.contains(e.target) &&
+          !notificationIcon.contains(e.target)) {
+        notificationDropdown.classList.remove("visible");
+        dropdownOpen = false;
+      }
+    });
+
+    // Initialize notifications
+    renderNotifications();
+
+    // Function to display the logged-in email
+    function displayLoggedInEmail() {
+      const loggedInEmail = localStorage.getItem("EmpEmail") || "Unknown User";
+      document.getElementById("loggedInEmail").textContent = loggedInEmail;
+    }
+
+    // Call the function to display the email when the page loads
+    displayLoggedInEmail();
+
+    let tasks = [];
+
+    async function fetchTasks() {
+      try {
+        const res = await fetch("/api/manager/allTasks");
+        tasks = await res.json();
+        const validTasks = tasks.filter(t => t && t.id != null);
+
+        // Calculate task stats
+        const totalTasks = validTasks.length;
+        const completedTasks = validTasks.filter(task => task.status === "Completed").length;
+        const notStartedTasks = validTasks.filter(task => task.status === "Not Started").length;
+        const inProgressTasks = validTasks.filter(task => task.status === "In Progress").length;
+        const overdueTasks = validTasks.filter(task =>
+          task.status !== "Completed" &&
+          task.end_date &&
+          new Date(task.end_date) < new Date()
+        ).length;
+
+        // Update task cards
+        document.querySelector('.task-card h3').textContent = totalTasks;
+        document.querySelectorAll('.task-card')[1].querySelector('h3').textContent = completedTasks;
+        document.querySelectorAll('.task-card')[2].querySelector('h3').textContent = inProgressTasks;
+        document.querySelectorAll('.task-card')[3].querySelector('h3').textContent = notStartedTasks;    
+        document.getElementById('OverDueTasks').textContent = overdueTasks;
+
+        // Calculate and render team task completion
+        renderTeamCompletion(validTasks);
+
+        renderTasks(validTasks);
+      } catch (err) {
+        console.error("Error fetching tasks:", err);
+        showToast('error', '❌ Fetch Error', 'Failed to load tasks');
+      }
+    }
+
+    function renderTasks(taskList) {
+      const container = document.getElementById("task-container");
+      // Placeholder for task rendering if needed
+    }
+
+    // Function to calculate and render team task completion
+    function renderTeamCompletion(tasks) {
+      const departments = ['IT', 'SAP', 'FINANCE', 'HR']; // Match department names from form
+      const completionList = document.querySelector('.completion-list');
+
+      // Clear existing content
+      completionList.innerHTML = '';
+
+      // Calculate completion for each department
+      departments.forEach(dept => {
+        const deptTasks = tasks.filter(task => task.department === dept);
+        const totalDeptTasks = deptTasks.length;
+        const completedDeptTasks = deptTasks.filter(task => task.status === "Completed").length;
+        const completionPercentage = totalDeptTasks > 0 
+          ? ((completedDeptTasks / totalDeptTasks) * 100).toFixed(1) 
+          : 0;
+
+        // Create completion row
+        const row = document.createElement('div');
+        row.className = 'completion-row';
+        row.innerHTML = `
+          <div class="team-name">${dept} team</div>
+          <div class="completion-bar">
+            <div class="bar-inner" style="width:${completionPercentage}%"></div>
+          </div>
+          <div class="percent">${completionPercentage}%</div>
+        `;
+        completionList.appendChild(row);
+      });
+
+      // Calculate Weekly Goals (tasks due this week)
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay()); // Start of current week (Sunday)
+      const endOfWeek = new Date(today);
+      endOfWeek.setDate(today.getDate() - today.getDay() + 6); // End of current week (Saturday)
+
+      const weeklyTasks = tasks.filter(task => {
+        const endDate = new Date(task.end_date);
+        return endDate >= startOfWeek && endDate <= endOfWeek;
+      });
+      const totalWeeklyTasks = weeklyTasks.length;
+      const completedWeeklyTasks = weeklyTasks.filter(task => task.status === "Completed").length;
+      const weeklyPercentage = totalWeeklyTasks > 0 
+        ? ((completedWeeklyTasks / totalWeeklyTasks) * 100).toFixed(1) 
+        : 0;
+
+      // Add Weekly Goals row
+      const weeklyRow = document.createElement('div');
+      weeklyRow.className = 'completion-row';
+      weeklyRow.innerHTML = `
+        <div class="team-name">Weekly Goals</div>
+        <div class="completion-bar">
+          <div class="bar-inner goal" style="width:${weeklyPercentage}%; background:#ffb300;"></div>
+        </div>
+        <div class="percent">${weeklyPercentage}%</div>
+      `;
+      completionList.appendChild(weeklyRow);
+    }
+
+    function startAutoRefresh() {
+      fetchTasks(); 
+      setInterval(fetchTasks, 5000); // Refresh every 5 sec
+    }
+
+    startAutoRefresh();
+
+    async function submitTask(event) {
+      event.preventDefault(); // Prevent page reload
+      const form = document.getElementById('taskForm');
+
+      // Check validity of required fields
+      if (!form.checkValidity()) {
+        form.reportValidity(); // Show default HTML5 validation messages
+        return; // Stop submission
+      }
+
+      // Gather form data
+      const formData = new FormData(form);
+      const taskData = {};
+      formData.forEach((value, key) => {
+        taskData[key] = value;
+      });
+
+      try {
+        const response = await fetch('/api/manager/taskasign', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(taskData)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || 'Failed to assign task');
+        }
+
+        closeTaskPopup();
+        showToast('success', '✅ Task Assigned', 'Task assigned successfully.');
+        form.reset(); // Reset the form after successful submission
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('error', '❌ Assignment Failed', 'Failed to assign task');
+      }
+    }
+
+    function openTaskPopup() {
+      document.getElementById('addTaskPopup').style.display = 'flex';
+    }
+
+    function closeTaskPopup() {
+      document.getElementById('addTaskPopup').style.display = 'none';
+    }
+
+    // Dark mode and monochrome toggle
+    const body = document.body;
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const darkModeIcon = document.getElementById("darkModeIcon");
+
+    darkModeToggle.addEventListener("change", () => {
+      body.classList.toggle("dark-mode");
+      darkModeIcon.classList.toggle("fa-sun");
+      darkModeIcon.classList.toggle("fa-moon");
+    });
+
+    let employeeEmails = [];
+
+    async function fetchEmployeeEmails() {
+      try {
+        const response = await fetch('/api/manager/allUsers');
+        const users = await response.json();
+        employeeEmails = users
+          .filter(user => user.role.toLowerCase() === 'employee')
+          .map(user => ({
+            email: user.email,
+            name: user.name
+          }));
+      } catch (err) {
+        console.error('Error fetching users:', err);
+        showToast('error', '❌ Fetch Error', 'Failed to load employee data');
+      }
+    }
+
+    // Call on load
+    fetchEmployeeEmails();
+
+    const personInput = document.getElementById("person");
+    const suggestionBox = document.getElementById("person-suggestions");
+
+    personInput.addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      suggestionBox.innerHTML = "";
+
+      if (query.length === 0) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      const suggestions = employeeEmails.filter(emp =>
+        emp.name.toLowerCase().includes(query) || emp.email.toLowerCase().includes(query)
+      );
+
+      if (suggestions.length === 0) {
+        suggestionBox.style.display = "none";
+        return;
+      }
+
+      suggestions.forEach(emp => {
+        const div = document.createElement("div");
+        div.textContent = `${emp.name} (${emp.email})`;
+        div.addEventListener("click", function () {
+          personInput.value = emp.email; // Populate input with selected email
+          suggestionBox.style.display = "none";
+        });
+        suggestionBox.appendChild(div);
+      });
+
+      suggestionBox.style.display = "block";
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener("click", function (event) {
+      if (!personInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+        suggestionBox.style.display = "none";
+      }
+    });
+
+    function toggleDropdown() {
+      const dropdown = document.getElementById("profileDropdown");
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+
+    // Close popup and dropdown when clicking outside
+    window.onclick = function(event) {
+      const popup = document.getElementById('addTaskPopup');
+      const dropdown = document.getElementById('profileDropdown');
+      if (event.target === popup) {
+        popup.style.display = 'none';
+      }
+      if (!event.target.matches('.profile-icon') && !notificationDropdown.contains(event.target) && !notificationIcon.contains(event.target)) {
+        dropdown.style.display = "none";
+      }
+    };
+  </script>
+</body>
+</html>

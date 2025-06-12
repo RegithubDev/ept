@@ -1,0 +1,494 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up - New User</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- You can add your Bootstrap or any CSS framework here -->
+    <style>
+        body {
+            background: #f5f6fa;
+            font-family: 'Poppins', sans-serif;
+        }
+        .signup-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(61,77,255,0.09);
+            padding: 32px 24px 24px 24px;
+        }
+        .signup-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+            gap: 12px;
+        }
+        .signup-title i {
+            font-size: 1.6em;
+            color: #555;
+            background: #eaeaea;
+            border-radius: 50%;
+            padding: 8px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+        .form-group {
+            flex: 1 1 360px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 18px;
+        }
+        label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #444;
+        }
+        .required { color: #d00; margin-left: 2px;}
+        input, select {
+            padding: 11px 14px;
+            border: 1.5px solid #aaa;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: #fafbfc;
+            transition: border 0.2s;
+        }
+        input:focus, select:focus {
+            border: 1.5px solid #3d4dff;
+            outline: none;
+        }
+        .actions-row {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn-primary {
+            background: #e53935;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 34px;
+            font-size: 1.07rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #b71c1c; }
+        .btn-secondary {
+            background: #444;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 34px;
+            font-size: 1.07rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: #222; }
+        @media (max-width: 800px) {
+            .form-row { flex-direction: column; gap: 0; }
+        }
+        
+        .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .toast {
+      position: relative;
+      min-width: 250px;
+      max-width: 350px;
+      background-color: white;
+      color: #333;
+      padding: 12px 40px 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      animation: fadeInOut 5s forwards;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      border-left: 4px solid transparent;
+    }
+
+    .toast.success {
+      border-left-color: #4caf50;
+    }
+
+    .toast.error {
+      border-left-color: #f44336;
+    }
+
+    .toast.info {
+      border-left-color: #2196f3;
+    }
+
+    .toast-title {
+      font-weight: bold;
+      margin-bottom: 2px;
+      color: #333;
+    }
+
+    .toast-message {
+      color: #666;
+    }
+
+    .toast-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
+    
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"/>
+</head>
+<body>
+<div id="toast-container" class="toast-container"></div>
+    <div class="signup-container">
+        <div class="signup-title">
+            <i class="fa fa-user-circle"></i>
+            New User
+        </div>
+        <!-- <form action="<%=request.getContextPath()%>/registerUser" method="post" autocomplete="off"> -->
+<form onsubmit="saveUser(event)" autocomplete="off">
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="name">Name <span class="required">*</span></label>
+      <input type="text" id="name" name="name" placeholder="Name" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email <span class="required">*</span></label>
+      <input type="email" id="email" name="email" placeholder="RE@email.com" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="mobile">Mobile Number <span class="required">*</span></label>
+      <input type="text" id="mobile" name="mobile" placeholder="9999999999" pattern="\d{10}" maxlength="10" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Password <span class="required">*</span></label>
+      <input type="text" id="password" name="password" placeholder="Password" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="role">Role <span class="required">*</span></label>
+      <select id="role" name="role" required>
+        <option value="">Select Role</option>
+        <option value="Employee">Employee</option>
+        <option value="Manager">Manager</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="department">Department<span class="required">*</span></label>
+      <select id="department" name="department" required>
+        <option value="">Select Department</option>
+        <option value="IT"> IT </option>
+        <option value="SAP"> SAP </option>
+        <option value="FINANCE"> FINANCE </option>
+        <option value="HR"> HR </option>
+        
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="status">Status <span class="required">*</span></label>
+      <select id="status" name="status" required>
+        <option value="">Select Status</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="reportingto">ReportingTo <span class="required">*</span></label>
+      <select id="reportingto" name="reportingto" required>
+        <option value="">Select value</option>
+        <option value="Masood Mallick">Masood Mallick</option>
+        <option value="Ashish">Ashish</option>
+        <option value="Shyam">Shyam</option>
+      </select>
+    </div>
+     
+    <div class="form-group">
+      <!-- Empty to maintain layout -->
+    </div>
+  </div>
+
+  <div class="actions-row">
+    <button type="submit" class="btn-primary">Submit</button>
+    <button type="button" class="btn-secondary" onclick="window.history.back();">
+      <i class="fa fa-angle-double-left"></i> Back
+    </button>
+  </div>
+
+</form>
+    </div>
+    
+   <!--  <script >
+  function saveUser(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const mobileNumber = document.getElementById('mobile').value.trim();
+    const role = document.getElementById('role').value;
+    const project = document.getElementById('site').value;
+    const status = document.getElementById('status').value;
+    const password = document.getElementById('password').value;
+
+    // Validate 
+    if (!name || !email || !mobile || !role || !project || !status || !password) {
+      alert("Please fill all the fields.");
+      return;
+    }
+
+    fetch('/api/users/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        mobileNumber: mobileNumber,
+        role: role,
+        project: project,
+        status: status,
+        password: password
+      })
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to create user");
+      }
+      return res.text(); 
+    })
+    .then(message => {
+      alert(message);
+      window.location.href ="/login";
+    })
+    .catch(err => {
+      alert("Error: " + err.message);
+    });
+  }
+</script> -->
+
+<script>
+
+function showToast(type, title, message) {
+    const toastContainer = document.getElementById("toast-container");
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+
+    const toastTitle = document.createElement("div");
+    toastTitle.className = "toast-title";
+    toastTitle.textContent = title;
+
+    const toastMessage = document.createElement("div");
+    toastMessage.className = "toast-message";
+    toastMessage.textContent = message;
+
+    const closeButton = document.createElement("button");
+    closeButton.className = "toast-close";
+    closeButton.textContent = "×";
+    closeButton.onclick = () => {
+        toast.style.animation = "none";
+        toast.remove();
+    };
+
+    toast.appendChild(toastTitle);
+    toast.appendChild(toastMessage);
+    toast.appendChild(closeButton);
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+
+  /*  async function saveUser(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const mobileNumber = document.getElementById('mobile').value.trim();
+    const role = document.getElementById('role').value;
+    const project = document.getElementById('site').value;
+    const status = document.getElementById('status').value;
+    const password = document.getElementById('password').value;
+
+    if (!name || !email || !mobileNumber || !role || !department || !status || !password) {
+      alert("Please fill all the fields.");
+      return;
+    }
+
+    try {
+      // Step 1: Fetch eligible users from Google Sheet via backend
+      const res = await fetch('/api/users/employees');
+      if (!res.ok) {
+        throw new Error("Failed to fetch eligible users list.");
+      }
+
+      const eligibleUsers = await res.json();
+
+      // Step 2: Check if the email and role BOTH match
+      const matchedUser = eligibleUsers.find(user =>
+        user.email.toLowerCase() === email.toLowerCase() &&
+        user.role.toLowerCase() === role.toLowerCase()
+      );
+
+      if (!matchedUser) {
+        alert("You are not eligible to register. Email and role must match the allowed list.");
+        return;
+      }
+
+      // Step 3: Proceed with user creation
+      const signupRes = await fetch('/api/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          mobileNumber,
+          role,
+          project,
+          status,
+          password
+        })
+      });
+
+      if (!signupRes.ok) {
+        const errorText = await signupRes.text();
+        throw new Error(errorText || "Failed to create user.");
+      }
+
+      const message = await signupRes.text();
+      alert(message);
+      window.location.href = "/login";
+
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  }  */
+  
+   async function saveUser(event) {
+	  event.preventDefault();
+
+	  const name = document.getElementById('name').value.trim();
+	  const email = document.getElementById('email').value.trim();
+	  const mobileNumber = document.getElementById('mobile').value.trim();
+	  const role = document.getElementById('role').value;
+	  const department = document.getElementById('department').value.trim();
+	  const status = document.getElementById('status').value.trim();
+	  const password = document.getElementById('password').value.trim();
+	  const reportingto = document.getElementById('reportingto').value.trim();
+
+	  if (!name || !email || !mobileNumber || !role || !department || !status || !password || !reportingto) {
+	    showToast('error', '❌Missing Fields', 'Please fill all the fields.');
+	    return;
+	  }
+
+	  try {
+	    // Step 1: Fetch eligible users from Google Sheet via backend
+	    const res = await fetch('/api/users/employees');
+	    if (!res.ok) {
+	      throw new Error("Failed to fetch eligible users list.");
+	    }
+
+	    const eligibleUsers = await res.json();
+
+	    // Step 2: Check if the email and role BOTH match
+	    const matchedUser = eligibleUsers.find(user =>
+	      user.email.toLowerCase() === email.toLowerCase() &&
+	      user.role.toLowerCase() === role.toLowerCase()
+	    );
+
+	    if (!matchedUser) {
+	      showToast('error', '❌Not Eligible', 'You are not eligible to register. Email and role must match the allowed list.');
+	      return;
+	    }
+
+	    // Step 3: Proceed with user creation
+	    const signupRes = await fetch('/api/users/signup', {
+	      method: 'POST',
+	      headers: {
+	        'Content-Type': 'application/json'
+	      },
+	      body: JSON.stringify({
+	        name,
+	        email,
+	        mobileNumber,
+	        role,
+	        department,
+	        status,
+	        password,
+	        reportingto
+	      })
+	    });
+
+	    if (!signupRes.ok) {
+	      const errorText = await signupRes.text();
+	      //console.error("Signup failed:", errorText);
+	      throw new Error(errorText || "Failed to create user.");
+	    }
+
+	    const message = await signupRes.text();
+	    showToast('success', '✅Registration Successful', message || 'User created successfully.');
+	    
+	    setTimeout(() => {
+	      window.location.href = "/login";
+	    }, 2000); // Allow toast to show before redirect
+
+	  } catch (err) {
+	    console.error(err);
+	    showToast('error', '❌Signup Error', err.message || 'An unexpected error occurred.');
+	  }
+	} 
+
+</script>
+
+
+</body>
+</html>

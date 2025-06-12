@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Performance Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-yH9Yl9a6Q3NwlAvG9UqEQo8P3YqLb7q2bKnxTeM3S8gZ9b98TywP/CUB9WBg2K+OEfDf8y5c7cvcrDFAmj0R4g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      padding: 1rem;
+    }
+    .card {
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+   .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #eae6ff;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+    .header h2 {
+      font-weight: bold;
+      font-size: 1.25rem;
+      margin: 0;
+    }
+    .status-labels span {
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .summary-box {
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .equal-height {
+      min-height: 17rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .chart-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+
+
+	
+	@media (max-width: 767.98px) {
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .row .col-12.col-md-6 {
+    flex: 0 0 48%;
+    max-width: 48%;
+    margin-bottom: 10px;
+  }
+}
+
+	
+	
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="d-flex align-items-center gap-2">
+    <!-- Back Button -->
+    <a href="/dashboard/manager" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
+    <i class="fa-solid fa-arrow-left"></i>
+  </a>
+    <!-- Dashboard Icon -->
+    <i class="fa-solid fa-chart-column text-primary"></i>
+<h2 class="mb-0 fs-6 fw-bold">Performance Dashboard</h2>
+
+  </div>
+
+  <!-- Logout Button -->
+  <a href="/login" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
+    <i class="fa-solid fa-right-from-bracket"></i> Logout
+  </a>
+</header>
+
+
+
+
+
+
+    <div class="row">
+      <div class="col-md-4 mb-1">
+        <div class="card equal-height">
+          <h6>Task Status Distribution</h6>
+          <div class="chart-wrapper">
+            <canvas id="statusChart"></canvas>
+          </div>
+          <div class="status-labels text-center mt-2">
+            <span class="text-primary">● Completed</span>
+            <span class="text-warning">● In Progress</span>
+            <span class="text-danger">● Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8 mb-3">
+        <div class="card equal-height">
+          <h6>Task Completion Over Time</h6>
+          <div class="chart-wrapper">
+            <canvas id="completionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="row">
+  <div class="col-12 col-md-6">
+    <div class="summary-box">
+      <h4>4.2</h4>
+      <p>Avg Rating</p>
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="summary-box">
+      <h4 class="text-success">89%</h4>
+      <p>On-time Rate</p>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h5>Performance Summary</h5>
+  <p>Tasks Completed This Month: <strong>67</strong></p>
+  <p>Average Task Duration: <strong>2.4 days</strong></p>
+  <p>Quality Score: <strong class="text-success">Excellent</strong></p>
+</div>
+
+
+  <script>
+    window.onload = function () {
+      const ctxStatus = document.getElementById('statusChart').getContext('2d');
+      new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+          labels: ['Completed', 'In Progress', 'Pending'],
+          datasets: [{
+            label: 'Tasks',
+            data: [65, 25, 10],
+            backgroundColor: ['#3b82f6', '#f59e0b', '#ef4444'],
+          }]
+        },
+        options: {
+          cutout: '70%',
+          plugins: {
+            legend: { display: false }
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+        }
+      });
+
+      const ctxCompletion = document.getElementById('completionChart').getContext('2d');
+      new Chart(ctxCompletion, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            {
+              label: 'Completed',
+              data: [45, 50, 47, 60, 55, 68],
+              backgroundColor: '#3b82f6'
+            },
+            {
+              label: 'Pending',
+              data: [15, 10, 17, 8, 12, 5],
+              backgroundColor: '#f59e0b'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>/html>

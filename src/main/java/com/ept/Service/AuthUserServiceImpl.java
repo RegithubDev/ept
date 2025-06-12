@@ -1,0 +1,209 @@
+//package com.ept.Service;
+//
+//import java.util.List;
+//import java.util.Optional;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.stereotype.Service;
+//
+//import com.ept.Dao.GoogleSheetsRepository;
+//import com.ept.Entity.Employees;
+//import com.ept.Entity.LoginResponse;
+//import com.ept.Entity.User;
+//
+//
+//@Service
+//public class AuthUserServiceImpl implements AuthUserService{
+//	
+//	 @Autowired
+//	    private GoogleSheetsRepository googleSheetsRepository;
+//
+//	@Override
+//	public String signup(User user) {
+//		 boolean success = googleSheetsRepository.saveUser(user);
+//	        return success ? "User signed up successfully!" : "Failed to sign up user.";
+//	}
+//
+//	
+////	@Override
+////	public Optional<LoginResponse> login(String email, String role) {
+////	    List<User> users = googleSheetsRepository.getAllUsers();
+////
+////	    for (User user : users) {
+////	        if (user.getEmail().equalsIgnoreCase(email.trim()) &&
+////	            user.getRole().equalsIgnoreCase(role.trim())) {
+////
+////	            String userRole = user.getRole().toLowerCase();
+////	            String redirectUrl = role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
+////
+////	            return Optional.of(new LoginResponse("Login successful", redirectUrl, userRole));
+////	        }
+////	    }
+////
+////	    return Optional.empty();
+////	}
+//	@Override
+//	public Optional<LoginResponse> login(String email, String role, String password) {
+//	    List<User> users = googleSheetsRepository.getAllUsers();
+//
+//	    for (User user : users) {
+//	        if (user.getEmail().equalsIgnoreCase(email.trim()) &&
+//	            user.getRole().equalsIgnoreCase(role.trim()) &&
+//	            user.getPassword().equals(password)) {
+//
+//	            String userRole = user.getRole().toLowerCase();
+//	            String redirectUrl = role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
+//
+//	            return Optional.of(new LoginResponse("Login successful", redirectUrl, userRole));
+//	        }
+//	    }
+//
+//	    return Optional.empty();
+//	}
+//
+//	 
+//	
+//
+//
+//	@Override
+//	public User getUserByEmail(String email) {
+//	User user	= googleSheetsRepository.userByemail(email);
+//		return user;
+//	}
+//
+//
+//	@Override
+//	public List<Employees> getAllemployees() {
+//	List<Employees> employees = googleSheetsRepository.allEmployees();
+//		return employees;
+//	}
+//
+//	
+//
+//	
+//
+//	
+//
+//	
+//	/*
+//	 * @Override public Optional<LoginResponse> login(String name, String email) {
+//	 * List<User> users = googleSheetsRepository.getAllUsers();
+//	 * 
+//	 * for (User user : users) { if (user.getName().equalsIgnoreCase(name.trim()) &&
+//	 * user.getEmail().equalsIgnoreCase(email.trim())) {
+//	 * 
+//	 * String role = user.getRole().toLowerCase(); String redirectUrl =
+//	 * role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
+//	 * 
+//	 * return Optional.of(new LoginResponse("Login successful", redirectUrl)); } }
+//	 * return Optional.empty(); }
+//	 */
+//	 
+//
+//}
+
+
+
+package com.ept.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ept.Dao.GoogleSheetsRepository;
+import com.ept.Entity.Employees;
+import com.ept.Entity.LoginResponse;
+import com.ept.Entity.User;
+
+
+@Service
+public class AuthUserServiceImpl implements AuthUserService {
+    @Autowired
+    private GoogleSheetsRepository googleSheetsRepository;
+
+    @Autowired
+    private EmailService emailService;
+        
+
+    private final ConcurrentHashMap<String, String> otpStore = new ConcurrentHashMap<>();
+    private final Random random = new Random();
+
+    @Override
+    public String signup(User user) {
+        boolean success = googleSheetsRepository.saveUser(user);
+        return success ? "User signed up successfully!" : "Failed to sign up user.";
+    }
+
+    @Override
+    public Optional<LoginResponse> login(String email, String role, String password) {
+        List<User> users = googleSheetsRepository.getAllUsers();
+
+        for (User user : users) {
+            if (user.getEmail().equalsIgnoreCase(email.trim()) &&
+                user.getRole().equalsIgnoreCase(role.trim()) &&
+                user.getPassword().equals(password)) {
+
+                String userRole = user.getRole().toLowerCase();
+                String redirectUrl = role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
+
+                return Optional.of(new LoginResponse("Login successful", redirectUrl, userRole));
+            }
+        }
+
+        return Optional.empty();
+    } 
+    
+  
+
+    @Override
+    public User getUserByEmail(String email) {
+        return googleSheetsRepository.userByemail(email);
+    }
+
+    @Override
+    public List<Employees> getAllemployees() {
+        return googleSheetsRepository.allEmployees();
+    }
+
+    @Override
+    public String requestOtp(String email) {
+        User user = googleSheetsRepository.userByemail(email);
+        if (user == null) {
+            return "User not found";
+        }
+
+        // Generate 4-digit OTP
+        String otp = String.format("%04d", random.nextInt(10000));
+        otpStore.put(email, otp);
+
+        // Send OTP via email
+        try {
+            emailService.sendOtpEmail(email, otp);
+            return "OTP sent to your email";
+        } catch (Exception e) {
+            System.err.println("Error sending OTP to " + email + ": " + e.getMessage());
+            e.printStackTrace();
+            return "Failed to send OTP";
+        }
+    }
+
+    @Override
+    public boolean verifyOtp(String email, String otp) {
+        String storedOtp = otpStore.get(email);
+        if (storedOtp != null && storedOtp.equals(otp)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean resetPassword(String email, String newPassword) {
+        return googleSheetsRepository.updateUserPassword(email, newPassword);
+    }
+}
+
+
