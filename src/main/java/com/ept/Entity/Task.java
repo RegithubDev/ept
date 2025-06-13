@@ -1,9 +1,6 @@
 package com.ept.Entity;
-
 import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-
 
 public class Task {
 	
@@ -13,22 +10,25 @@ public class Task {
 	private String area;
 	private String sub_area;
 	private String priority;
-	private String person;
-	
+	private String person;	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate start_date;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate end_date;
-	
+        private LocalDate start_date;
+       @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private LocalDate end_date;
 	private String bottlenecks;
 	private Long storypoints;
 	private String status;
+	private LocalDate completion_date;
 	private String remarks;
 	
 	
 	
-	
+	public LocalDate getCompletion_date() {
+		return completion_date;
+	}
+	public void setCompletion_date(LocalDate completion_date) {
+		this.completion_date = completion_date;
+	}
 	public String getArea() {
 		return area;
 	}
@@ -108,7 +108,4 @@ public class Task {
 	public void setDepartment(String department) {
 		this.department = department;
 	}
-	
-	
-
 }
