@@ -16,7 +16,7 @@ public class ViewController {
 	    return "forward:/employee.html";
 	  }
 	  
-	  @GetMapping("/login")
+	  @GetMapping("/")
 	    public String login() {
 	        return "forward:/login.html"; 
 	    }
