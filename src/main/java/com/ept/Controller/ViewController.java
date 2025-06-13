@@ -49,7 +49,7 @@ public class ViewController {
 	    @GetMapping("/storypoints")
 	    public String storyPoints() {
 	    	
-	    	return "forward:/storyPoints.html";
+	    	return "forward:/storypoints.html";
 	    	
 	    }
 	    
