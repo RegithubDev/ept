@@ -161,6 +161,7 @@ public class GoogleSheetsRepository {
 	            rowData.add(task.getBottlenecks() != null ? task.getBottlenecks() : "");
 	            rowData.add(task.getStorypoints() != null ? task.getStorypoints().toString() : "");
 	            rowData.add(task.getStatus() != null ? task.getStatus() : "");
+		    rowData.add(task.getCompletion_date() != null ? task.getCompletion_date().format(formatter) : "");
 	            rowData.add(task.getRemarks() != null ? task.getRemarks() : "");
 
 
@@ -212,6 +213,7 @@ public class GoogleSheetsRepository {
 		            emptyTask.setEnd_date(null);
 		            emptyTask.setBottlenecks("");
 		            emptyTask.setStatus("");
+			    emptyTask.setCompletion_date(null);
 		            emptyTask.setRemarks("");
 		            return Collections.singletonList(emptyTask);
 		        }
@@ -233,7 +235,8 @@ public class GoogleSheetsRepository {
 		                task.setBottlenecks(getStringSafe(row, 9));
 		                task.setStorypoints(getLongSafe(row, 10));
 		                task.setStatus(getStringSafe(row, 11));
-		                task.setRemarks(getStringSafe(row, 12));
+				task.setCompletion_date(parseLocalDateSafe(row, 12));
+		                task.setRemarks(getStringSafe(row, 13));
 
 		                tasks.add(task);
 		            } catch (Exception rowEx) {
@@ -283,7 +286,8 @@ public class GoogleSheetsRepository {
 		                    task.setBottlenecks(getStringSafe(row, 9));
 		                    task.setStorypoints(getLongSafe(row, 10));
 		                    task.setStatus(getStringSafe(row, 11));
-		                    task.setRemarks(getStringSafe(row, 12));
+				    task.setCompletion_date(parseLocalDateSafe(row, 12));
+		                    task.setRemarks(getStringSafe(row, 13));
 
 		                    return Optional.of(task);
 		                }
@@ -335,11 +339,12 @@ public class GoogleSheetsRepository {
 		                            updatedTask.getBottlenecks(),
 		                            updatedTask.getStorypoints() == null ? "":updatedTask.getStorypoints(),
 		                            updatedTask.getStatus(),
+					    updatedTask.getCompletion_date() != null ? updatedTask.getCompletion_date().format(formatter) : "",
 		                            updatedTask.getRemarks()
 		                    );
 
 		                    ValueRange body = new ValueRange().setValues(Collections.singletonList(updatedRow));
-		                    String range = "Tasks.Resustainability!A" + (i + 1) + ":M" + (i + 1); // Adjust to include column L (remarks)
+		                    String range = "Tasks.Resustainability!A" + (i + 1) + ":N" + (i + 1); // Adjust to include column L (remarks)
 
 		                    sheetsService.spreadsheets().values()
 		                            .update(sheetProperties.getTasksid(), range, body)
@@ -397,7 +402,8 @@ public class GoogleSheetsRepository {
 		                task.setBottlenecks(getStringSafe(row, 9));
 		                task.setStorypoints(getLongSafe(row, 10));
 		                task.setStatus(getStringSafe(row, 11));
-		                task.setRemarks(getStringSafe(row, 12));
+				task.setCompletion_date(parseLocalDateSafe(row, 12));
+		                task.setRemarks(getStringSafe(row, 13));
 
 		                employeeTasks.add(task);
 		            } catch (Exception rowEx) {
