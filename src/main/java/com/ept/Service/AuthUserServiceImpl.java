@@ -1,109 +1,3 @@
-//package com.ept.Service;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.stereotype.Service;
-//
-//import com.ept.Dao.GoogleSheetsRepository;
-//import com.ept.Entity.Employees;
-//import com.ept.Entity.LoginResponse;
-//import com.ept.Entity.User;
-//
-//
-//@Service
-//public class AuthUserServiceImpl implements AuthUserService{
-//	
-//	 @Autowired
-//	    private GoogleSheetsRepository googleSheetsRepository;
-//
-//	@Override
-//	public String signup(User user) {
-//		 boolean success = googleSheetsRepository.saveUser(user);
-//	        return success ? "User signed up successfully!" : "Failed to sign up user.";
-//	}
-//
-//	
-////	@Override
-////	public Optional<LoginResponse> login(String email, String role) {
-////	    List<User> users = googleSheetsRepository.getAllUsers();
-////
-////	    for (User user : users) {
-////	        if (user.getEmail().equalsIgnoreCase(email.trim()) &&
-////	            user.getRole().equalsIgnoreCase(role.trim())) {
-////
-////	            String userRole = user.getRole().toLowerCase();
-////	            String redirectUrl = role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
-////
-////	            return Optional.of(new LoginResponse("Login successful", redirectUrl, userRole));
-////	        }
-////	    }
-////
-////	    return Optional.empty();
-////	}
-//	@Override
-//	public Optional<LoginResponse> login(String email, String role, String password) {
-//	    List<User> users = googleSheetsRepository.getAllUsers();
-//
-//	    for (User user : users) {
-//	        if (user.getEmail().equalsIgnoreCase(email.trim()) &&
-//	            user.getRole().equalsIgnoreCase(role.trim()) &&
-//	            user.getPassword().equals(password)) {
-//
-//	            String userRole = user.getRole().toLowerCase();
-//	            String redirectUrl = role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
-//
-//	            return Optional.of(new LoginResponse("Login successful", redirectUrl, userRole));
-//	        }
-//	    }
-//
-//	    return Optional.empty();
-//	}
-//
-//	 
-//	
-//
-//
-//	@Override
-//	public User getUserByEmail(String email) {
-//	User user	= googleSheetsRepository.userByemail(email);
-//		return user;
-//	}
-//
-//
-//	@Override
-//	public List<Employees> getAllemployees() {
-//	List<Employees> employees = googleSheetsRepository.allEmployees();
-//		return employees;
-//	}
-//
-//	
-//
-//	
-//
-//	
-//
-//	
-//	/*
-//	 * @Override public Optional<LoginResponse> login(String name, String email) {
-//	 * List<User> users = googleSheetsRepository.getAllUsers();
-//	 * 
-//	 * for (User user : users) { if (user.getName().equalsIgnoreCase(name.trim()) &&
-//	 * user.getEmail().equalsIgnoreCase(email.trim())) {
-//	 * 
-//	 * String role = user.getRole().toLowerCase(); String redirectUrl =
-//	 * role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
-//	 * 
-//	 * return Optional.of(new LoginResponse("Login successful", redirectUrl)); } }
-//	 * return Optional.empty(); }
-//	 */
-//	 
-//
-//}
-
-
 
 package com.ept.Service;
 
@@ -112,6 +6,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ept.Dao.GoogleSheetsRepository;
@@ -132,8 +27,18 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final ConcurrentHashMap<String, String> otpStore = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
-    @Override
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+   @Override
     public String signup(User user) {
+        // Check if user with the given email already exists
+        User existingUser = getUserByEmail(user.getEmail());
+        if (existingUser != null) {
+            return "Email already registered. Please use a different email or log in.";
+        }
+
+        // Hash the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         boolean success = googleSheetsRepository.saveUser(user);
         return success ? "User signed up successfully!" : "Failed to sign up user.";
     }
@@ -145,7 +50,8 @@ public class AuthUserServiceImpl implements AuthUserService {
         for (User user : users) {
             if (user.getEmail().equalsIgnoreCase(email.trim()) &&
                 user.getRole().equalsIgnoreCase(role.trim()) &&
-                user.getPassword().equals(password)) {
+               // user.getPassword().equals(password)) {
+                passwordEncoder.matches(password, user.getPassword())) {
 
                 String userRole = user.getRole().toLowerCase();
                 String redirectUrl = role.equals("manager") ? "/dashboard/manager" : "/dashboard/employee";
@@ -202,7 +108,9 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Override
     public boolean resetPassword(String email, String newPassword) {
-        return googleSheetsRepository.updateUserPassword(email, newPassword);
+        // Hash the new password before updating
+        String hashedPassword = passwordEncoder.encode(newPassword);
+        return googleSheetsRepository.updateUserPassword(email, hashedPassword);
     }
 }
 
