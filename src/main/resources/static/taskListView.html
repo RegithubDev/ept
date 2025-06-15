@@ -450,31 +450,31 @@
       <div class="edit-grid">
         <div>
           <label>Description:</label>
-          <input type="text" id="editDescription" disabled />
+          <input type="text" id="editDescription" required />
         </div>
         <div>
           <label>Department:</label>
-          <input type="text" id="editDepartment" disabled />
+          <input type="text" id="editDepartment" required />
         </div>
         <div>
           <label>Area:</label>
-          <input type="text" id="editArea" disabled />
+          <input type="text" id="editArea"  />
         </div>
         <div>
           <label>Sub-area:</label>
-          <input type="text" id="editSubarea" disabled />
+          <input type="text" id="editSubarea"  />
         </div>
         <div>
           <label>Person:</label>
-          <input type="text" id="editPerson" disabled />
+          <input type="text" id="editPerson" required />
         </div>
         <div>
           <label>Start Date:</label>
-          <input type="date" id="editStartDate" disabled />
+          <input type="date" id="editStartDate" required />
         </div>
         <div>
           <label>End Date:</label>
-          <input type="date" id="editEndDate" disabled />
+          <input type="date" id="editEndDate" required />
         </div>
         <div>
           <label>Storypoints:</label>
@@ -491,19 +491,19 @@
         </div>
         <div>
           <label>Priority:</label>
-          <input type="text" id="editPriority" disabled />
+          <input type="text" id="editPriority" required />
         </div>
         <div>
           <label>Bottlenecks:</label>
-          <input type="text" id="editBottlenecks" disabled />
+          <input type="text" id="editBottlenecks" required />
         </div>
         <div>
           <label>Completion Date:</label>
-          <input type="date" id="editCompletionDate" disabled />
+          <input type="date" id="editCompletionDate" required />
         </div>
         <div>
           <label>Remarks:</label>
-          <input type="text" id="editRemarks" required />
+          <input type="text" id="editRemarks" />
         </div>
       </div>
       <div class="popup-actions">
@@ -650,17 +650,17 @@ function renderTasks() {
               <td>${task.id}</td>
               <td>${task.description}</td>
               <td>${task.department}</td>
-              <td>${task.area}</td>
+              <td>${task.area || '-'}</td>
               <td>${task.sub_area || '-'}</td>
               <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
-              <td>${task.person || '-'}</td>
+              <td>${task.person}</td>
               <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
               <td>${task.start_date ||'-'}</td>
               <td>${task.end_date ||'-'}</td>
               <td><span class="tag ${task.status?.toLowerCase().replace(/\s/g, '-')}">${task.status}</span></td>
               <td>${task.completion_date || '-'}</td>
               <td>${task.bottlenecks || '-'}</td>
-              <td>${task.remarks}</td>
+              <td>${task.remarks || '-'}</td>
               <td>
                 <button class="edit-btn" title="Edit" style="background:none; border:none; cursor:pointer;" onclick="openEditTaskPopup(${task.id})">
                   <i class="fa fa-pen"></i>
