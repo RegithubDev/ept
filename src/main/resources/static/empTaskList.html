@@ -601,7 +601,7 @@ function renderTasks(tasks) {
             <span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span>
             <span class="tag area">${task.area}</span>
           </div>
-          <div><strong>Due:</strong> ${task.end_date}</div>
+          <div><strong>Due:</strong> ${task.end_date || '-'}</div>
         </div>
       </div>
     `).join("");
@@ -610,19 +610,20 @@ function renderTasks(tasks) {
       <table>
         <thead>
           <tr>
-            <th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>StoryPoints</th><th>Start Date</th><th>Due Date</th>
+          <th>Sl.No</th><th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>StoryPoints</th><th>Start Date</th><th>Due Date</th>
           </tr>
         </thead>
         <tbody>
-          ${filtered.map(task => `
+          ${filtered.map((task,i) => `
             <tr>
+              <td>${i+1}</td>
               <td>${task.description}</td>
               <td>${task.department}</td>
               <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
               <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
               <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
-              <td>${task.start_date}</td>
-              <td>${task.end_date}</td>
+              <td>${task.start_date || '-'}</td>
+              <td>${task.end_date || '-'}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -663,7 +664,7 @@ function renderTasks(tasks) {
               <td>${task.person}</td>
               <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
               <td>${task.start_date || '-'}</td>
-              <td>${task.end_date}</td>
+              <td>${task.end_date || '-'}</td>
               <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
               <td>${task.bottlenecks}</td>
               <td>${task.remarks}</td>
