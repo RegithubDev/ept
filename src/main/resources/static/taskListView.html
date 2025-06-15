@@ -417,7 +417,7 @@
     <i class="fa-solid fa-clipboard-list" style="color: #1e40af; font-size: 1.2rem;"></i>
     <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Task List View</h2>
   </div>
-  <a href="/" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
+  <a href="/login" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
     <i class="fas fa-power-off"></i> Logout
   </a>
 </header>
@@ -608,7 +608,7 @@ function renderTasks() {
             <span class="tag ${task.status?.replace(" ", "-").toLowerCase()}">${task.status}</span>
             <span class="tag area">${task.area}</span>
           </div>
-          <div><strong>Due:</strong> ${task.end_date}</div>
+          <div><strong>Due:</strong> ${task.end_date || '_'}</div>
         </div>
       </div>
     `).join("");
@@ -617,19 +617,20 @@ function renderTasks() {
       <table>
         <thead>
           <tr>
-            <th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Storypoints</th><th>Start Date</th><th>Due Date</th>
+          <th>Task No.</th> <th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Storypoints</th><th>Start Date</th><th>Due Date</th>
           </tr>
         </thead>
         <tbody>
           ${filtered.map(task => `
             <tr class="priority-${task.priority?.toLowerCase() || 'none'}">
+              <td>${task.id}</td>
               <td>${task.description}</td>
               <td>${task.department}</td>
               <td>${task.status}</td>
               <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
               <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
-              <td>${task.start_date}</td>
-              <td>${task.end_date}</td>
+              <td>${task.start_date ||'-'}</td>
+              <td>${task.end_date ||'-'}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -654,8 +655,8 @@ function renderTasks() {
               <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
               <td>${task.person || '-'}</td>
               <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
-              <td>${task.start_date || '-'}</td>
-              <td>${task.end_date || '-'}</td>
+              <td>${task.start_date ||'-'}</td>
+              <td>${task.end_date ||'-'}</td>
               <td><span class="tag ${task.status?.toLowerCase().replace(/\s/g, '-')}">${task.status}</span></td>
               <td>${task.completion_date || '-'}</td>
               <td>${task.bottlenecks || '-'}</td>
@@ -759,7 +760,6 @@ document.getElementById('editTaskForm').addEventListener('submit', function(e) {
     remarks: document.getElementById('editRemarks').value
   };
 
- 
 tasks[currentEditTaskIndex] = updatedTask;
 
 fetch(`/api/manager/updateTask/${updatedTask.id}`, {
