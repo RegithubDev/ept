@@ -658,8 +658,8 @@ function renderTasks(tasks) {
               <td>${task.id}</td>
               <td>${task.description}</td>
               <td>${task.department}</td>
-              <td>${task.area}</td>
-              <td>${task.sub_area}</td>
+              <td>${task.area || '-'}</td>
+              <td>${task.sub_area || '-'}</td>
               <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
               <td>${task.person}</td>
               <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
@@ -667,7 +667,7 @@ function renderTasks(tasks) {
               <td>${task.end_date || '-'}</td>
               <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
               <td>${task.bottlenecks}</td>
-              <td>${task.remarks}</td>
+              <td>${task.remarks || '-'}</td>
               <td>
                 <button class="edit-btn" title="Edit" onclick="openEditTaskPopup(${task.id})">
                   <i class="fa fa-pen"></i>
