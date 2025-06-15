@@ -728,35 +728,7 @@ document.getElementById("taskForm").addEventListener("submit", async function(ev
     remarks: document.getElementById("remarks").value
   };
 
- /*  if (taskId) {
-    try {
-      const response = await fetch(`/api/employee/updateTask/${taskId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskData)
-      });
-
-      if (!response.ok) {
-        throw new Error("Update failed");
-      }
-
-      const taskIndex = tasksInfo.findIndex(t => t.id == taskId);
-      if (taskIndex !== -1) {
-        tasksInfo[taskIndex] = { ...tasksInfo[taskIndex], ...taskData };
-      }
-
-      renderTasks(tasksInfo); // Refresh UI
-      alert("Task updated successfully.");
-      closeTaskPopup();
-    } catch (err) {
-      console.error("Error updating task:", err);
-      alert("Failed to update task.");
-    }
-  } else {
-    alert("Invalid Task ID");
-  }
-}); */
-
+ 
 if (taskId) {
 	  try {
 	    const response = await fetch(`/api/employee/updateTask/${taskId}`, {
