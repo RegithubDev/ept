@@ -759,34 +759,7 @@ document.getElementById('editTaskForm').addEventListener('submit', function(e) {
     remarks: document.getElementById('editRemarks').value
   };
 
- /*  tasks[currentEditTaskIndex] = updatedTask;
-
-   fetch(`/api/manager/updateTask/${updatedTask.id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updatedTask)
-  })
-  .then(response => {
-    if (!response.ok) throw new Error("Failed to update task");
-    return response.text();
-  })
-  .then(data => {
-    console.log("Task updated successfully:", data);
-    closeEditTaskPopup();
-    renderTasks();
-  })
-  .catch(error => {
-    console.error("Error updating task:", error);
-    alert("Failed to update task. Check console for details.");
-  });
-});
-
-document.getElementById('editTaskPopup').addEventListener('click', function(e) {
-  if (e.target === this) closeEditTaskPopup();
-});  */
-
+ 
 tasks[currentEditTaskIndex] = updatedTask;
 
 fetch(`/api/manager/updateTask/${updatedTask.id}`, {
