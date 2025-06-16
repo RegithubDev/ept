@@ -803,7 +803,7 @@
 	        if (toast.parentNode) {
 	            toast.remove();
 	        }
-	    }, 5000);
+	    }, 1000);
 	}
 
    
@@ -1028,7 +1028,7 @@
           showToast("success", "✅Success!", "Login Successfull.");
 	      setTimeout(() => {
 	        window.location.href = data.redirectUrl;
-	      }, 2000);
+	      }, 250);
         } else {
           const errorText = await response.text();
          // alert('Login failed: ' + errorText);
