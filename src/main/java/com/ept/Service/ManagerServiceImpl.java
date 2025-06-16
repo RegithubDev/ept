@@ -13,13 +13,32 @@ import com.ept.Entity.User;
 public class ManagerServiceImpl implements ManagerService {
 	
 	     @Autowired
-	    private GoogleSheetsRepository googleSheetsRepository;
+	     private GoogleSheetsRepository googleSheetsRepository;
+	     @Autowired
+	     private EmailService emailService;
 
-	     @Override
-	 	public String taskasign(Task task) {
-	 		 boolean success = googleSheetsRepository.saveTask(task);
-	 	        return success ? "task created and assigned successfully!" : "Failed to create and assign task.";
-	 	}
+	      @Override
+	     public String taskasign(Task task) {
+	         boolean success = googleSheetsRepository.saveTask(task);
+
+	         if (success) {
+	             String subject = "New Task Assigned to You";
+	             String body = "Dear " + task.getPerson() + ",\n\nA new task has been assigned to you:\n\n"
+	                         + "Description: " + task.getDescription() + "\n"
+	                         + "Priority: " + task.getPriority() + "\n"
+	                         + "Department: " + task.getDepartment() + "\n"
+	                         + "Start Date: " + task.getStart_date() + "\n"
+	                         + "End Date: " + task.getEnd_date() + "\n\n"
+	                         + "Please login to your dashboard to view more details\n."
+	                         + "Note: This is a system-generated message. Please do not reply.\n\n"
+	 		                + "Regards,\nTask Management System.";
+
+	             // Send email to employee
+	             emailService.sendEmail(task.getPerson(), subject, body);
+	         }
+
+	         return success ? "Task created and assigned successfully!" : "Failed to create and assign task.";
+	     }
 
 	 	@Override
 	 	public List<Task> getAllTasks() {
@@ -42,16 +61,29 @@ public class ManagerServiceImpl implements ManagerService {
 	 	@Override
 	 	public String update(Long id, Task updatedTask) {
 	 	    Optional<Task> existingTask = googleSheetsRepository.findById(id);
-	 	    if (existingTask.isEmpty()) {	        
-	 	    	return "Task with ID: " + id + "not found";
+	 	    if (existingTask.isEmpty()) {
+	 	        return "Task with ID: " + id + " not found";
 	 	    }
 
 	 	    boolean isUpdated = googleSheetsRepository.updateById(id, updatedTask);
-	 	        return isUpdated ? "Task updated successfully." : "Failed to update task.";
+
+	 	    if (isUpdated) {
+	 	        String subject = "Task Updated";
+
+	 	        String body = "Dear " + updatedTask.getPerson() + ",\n\n"
+	 	                    + "Your assigned task has been updated by the manager. Please check the details below:\n\n"
+	 	                    + "Description : " + updatedTask.getDescription() + "\n"
+	 	                    + "Status      : " + updatedTask.getStatus() + "\n\n"
+	 	                    + "Note: This is a system-generated message. Please do not reply.\n\n"
+	 	                    + "Regards,\nTask Management System.";
+
+	 	        // Notify employee of task update
+	 	        emailService.sendEmail(updatedTask.getPerson(), subject, body);
+
+	 	        return "Task updated successfully.";
+	 	    }
+
+	 	    return "Failed to update task.";
 	 	}
-
-	 	
-	
-
 	
 }
