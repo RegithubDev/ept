@@ -824,7 +824,8 @@
       </div>
       <div class="form-row">
       <div class="popup-buttons">
-        <button type="submit" class="btn-submit" onclick="submitTask(event)">Submit</button>
+        <!-- <button type="submit" class="btn-submit" onclick="submitTask(event)">Submit</button> -->
+        <button type="submit" class="btn-submit" id="submitTaskBtn" onclick="submitTask(event)">Submit</button>
         <button type="button" class="btn-back" onclick="closeTaskPopup()">« Cancel</button>
       </div>
       </div>
@@ -1070,42 +1071,53 @@ function closeTaskPopup() {
 }
 
 async function submitTask(event) {
-  event.preventDefault();
-  const form = document.getElementById('taskForm');
+	  event.preventDefault();
 
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
+	  const form = document.getElementById('taskForm');
+	  const submitBtn = event.target; // Get the clicked button directly
 
-  const formData = new FormData(form);
-  const taskData = {};
-  formData.forEach((value, key) => {
-    taskData[key] = value;
-  });
+	  if (!form.checkValidity()) {
+	    form.reportValidity();
+	    return;
+	  }
 
-  try {
-    const response = await fetch('/api/manager/taskasign', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(taskData)
-    });
+	  // Disable button and show loading text
+	  submitBtn.disabled = true;
+	  const originalText = submitBtn.innerText;
+	  submitBtn.innerText = 'Assigning...';
 
-    if (!response.ok) {
-      throw new Error('Failed to assign task');
-    }
+	  const formData = new FormData(form);
+	  const taskData = {};
+	  formData.forEach((value, key) => {
+	    taskData[key] = value;
+	  });
 
-    closeTaskPopup();
-    showToast('success', '✅Task Assigned', 'Task assigned successfully.');
-    form.reset();
-    await fetchTasks();
-  } catch (error) {
-    showToast('error', '❌Assignment Failed', 'Failed to assign task');
-  }
-}
+	  try {
+	    const response = await fetch('/api/manager/taskasign', {
+	      method: 'POST',
+	      headers: {
+	        'Content-Type': 'application/json'
+	      },
+	      body: JSON.stringify(taskData)
+	    });
 
+	    if (!response.ok) {
+	      throw new Error('Failed to assign task');
+	    }
+
+	    closeTaskPopup();
+	    showToast('success', '✅ Task Assigned', 'Task assigned successfully.');
+	    form.reset();
+	    await fetchTasks();
+	  } catch (error) {
+	    console.error('Assignment error:', error);
+	    showToast('error', '❌ Assignment Failed', 'Failed to assign task');
+	  } finally {
+	    // Re-enable the button and reset text
+	    submitBtn.disabled = false;
+	    submitBtn.innerText = originalText;
+	  }
+	}
 const body = document.body;
 const darkModeToggle = document.getElementById("darkModeToggle");
 const darkModeIcon = document.getElementById("darkModeIcon");
