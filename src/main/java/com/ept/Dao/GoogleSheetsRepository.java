@@ -400,7 +400,7 @@ public class GoogleSheetsRepository {
 		                task.setStart_date(parseLocalDateSafe(row, 7));
 		                task.setEnd_date(parseLocalDateSafe(row, 8));
 		                task.setBottlenecks(getStringSafe(row, 9));
-		                task.setStorypoints(getLongSafe(row, 10));
+		               // task.setStorypoints(getLongSafe(row, 10));
 		                task.setStatus(getStringSafe(row, 11));
 				task.setCompletion_date(parseLocalDateSafe(row, 12));
 		                task.setRemarks(getStringSafe(row, 13));
