@@ -49,18 +49,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 		        String employeeName = employee != null ? employee.getName() : personEmail; // fallback to email if not found
 
 		        String subject = "Task Updated by " + employeeName;
+
 		        String body = "Dear Manager,\n\n"
-		                + "The following task was updated by " + updatedTask.getPerson() + ":\n\n"
-		                + "Task ID       : " + updatedTask.getId() + "\n"
-		                + "Task Name     : " + updatedTask.getDescription() + "\n"
-		                + "Department    : " + updatedTask.getDepartment() + "\n"
-		                + "Priority      : " + updatedTask.getPriority() + "\n"
-		                + "Start Date    : " + updatedTask.getStart_date() + "\n"
-		                + "End Date      : " + updatedTask.getEnd_date() + "\n"
-		                + "Status        : **" + updatedTask.getStatus().toUpperCase() + "**\n\n"
-		                + "Please review it in your dashboard.\n\n"
-		                + "Note: This is a system-generated message. Please do not reply.\n\n"
-		                + "Regards,\nTask Management System.";
+		                    + "The following task has been updated by " + updatedTask.getPerson() + ". Please review the details below:\n\n"
+		                    + "• Task ID      : " + updatedTask.getId() + "\n"
+		                    + "• Task Name    : " + updatedTask.getDescription() + "\n"
+		                    + "• Department   : " + updatedTask.getDepartment() + "\n"
+		                    + "• Priority     : " + updatedTask.getPriority() + "\n"
+		                    + "• Start Date   : " + updatedTask.getStart_date() + "\n"
+		                    + "• End Date     : " + updatedTask.getEnd_date() + "\n"
+		                    + "• Status       : " + updatedTask.getStatus().toUpperCase() + "\n\n"
+		                    + "Please log in to your dashboard to review the task.\n\n"
+		                    + "Best regards,\n"
+		                    + "Task Management System.\n\n"
+		                    + "Note: This is a system-generated message. Please do not reply.";
 
 		        // Notify manager
 		        emailService.sendEmail(managerEmail, subject, body);
