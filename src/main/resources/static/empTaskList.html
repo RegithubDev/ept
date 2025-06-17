@@ -398,12 +398,15 @@
       100% { opacity: 0; transform: translateY(-20px); }
     }
     
+    
+    
   </style>
 </head>
 
 <body>
 
 <div id="toast-container" class="toast-container"></div>
+
 
 <header style="background-color: #eae6ff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: -0.9rem;">
   <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -413,7 +416,7 @@
     <i class="fa-solid fa-clipboard-list" style="color: #1e40af; font-size: 1.2rem;"></i>
     <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Task List View</h2>
   </div>
-  <a href="/" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
+  <a href="/login" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
     <i class="fa-solid fa-right-from-bracket"></i> Logout
   </a>
 </header>
@@ -447,7 +450,7 @@
     <div class="form-grid">
       <label>
         Description:
-        <input id="description" placeholder="Enter description"  />
+        <input id="description" placeholder="Enter description" disabled />
       </label>
        <label>
         Department:
@@ -477,10 +480,10 @@
         End Date:
         <input id="endDate" type="date" placeholder="dd-mm-yyyy" disabled/>
       </label>     
-      <label>
+      <!-- <label>
         StoryPoints:
         <input id="storypoints" type="number" min="0" placeholder="Enter storypoints" disabled />
-      </label>
+      </label> -->
       <label>
         Status:
         <select id="status" required>
@@ -540,7 +543,7 @@ function showToast(type, title, message) {
         if (toast.parentNode) {
             toast.remove();
         }
-    }, 5000);
+    }, 2000);
 }
 
 
@@ -593,7 +596,7 @@ function renderTasks(tasks) {
           </div>
           <div class="card-tags-right">
             <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
-            // <span class="tag points">${(task.storypoints == null)?"-":(task.storypoints == 0 ?"-":task.storypoints)} pts</span>
+            <span class="tag points">${(task.storypoints == null)?"-":(task.storypoints == 0 ?"-":task.storypoints)} pts</span>
           </div>
         </div>
         <div class="card-footer">
@@ -610,7 +613,7 @@ function renderTasks(tasks) {
       <table>
         <thead>
           <tr>
-          <th>Sl.No</th><th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Start Date</th><th>Due Date</th>
+          <th>Sl.No</th><th>Description</th><th>Department</th><th>Status</th><th>Priority</th><!--<th>StoryPoints</th>--><th>Start Date</th><th>Due Date</th>
           </tr>
         </thead>
         <tbody>
@@ -621,7 +624,7 @@ function renderTasks(tasks) {
               <td>${task.department}</td>
               <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
               <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
-              // <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
+              <!-- <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td> -->
               <td>${task.start_date || '-'}</td>
               <td>${task.end_date || '-'}</td>
             </tr>
@@ -642,7 +645,7 @@ function renderTasks(tasks) {
             <th>Sub-area</th>
             <th>Priority</th>
             <th>Person</th>
-            // <th>Storypoints</th>
+           <!-- <th>StoryPoints</th> -->
             <th>Start Date</th>
             <th>End Date</th>
             <th>Status</th>
@@ -658,16 +661,16 @@ function renderTasks(tasks) {
               <td>${task.id}</td>
               <td>${task.description}</td>
               <td>${task.department}</td>
-              <td>${task.area || '-'}</td>
-              <td>${task.sub_area || '-'}</td>
+              <td>${task.area}</td>
+              <td>${task.sub_area}</td>
               <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
               <td>${task.person}</td>
-               // <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
+              <!-- <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td> -->
               <td>${task.start_date || '-'}</td>
               <td>${task.end_date || '-'}</td>
               <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
               <td>${task.bottlenecks}</td>
-              <td>${task.remarks || '-'}</td>
+              <td>${task.remarks}</td>
               <td>
                 <button class="edit-btn" title="Edit" onclick="openEditTaskPopup(${task.id})">
                   <i class="fa fa-pen"></i>
@@ -693,7 +696,7 @@ function openEditTaskPopup(index) {
   document.getElementById("assignedTo").value = task.person || '';
   document.getElementById("startDate").value = task.start_date || '';
   document.getElementById("endDate").value = task.end_date || '';
-  // document.getElementById("storypoints").value = task.storypoints || '';
+  /* document.getElementById("storypoints").value = task.storypoints || ''; */
   document.getElementById("status").value = task.status || '';
   document.getElementById("bottlenecks").value = task.bottlenecks || '';
   document.getElementById("remarks").value = task.remarks || '';
@@ -723,15 +726,17 @@ document.getElementById("taskForm").addEventListener("submit", async function(ev
     person: document.getElementById("assignedTo").value,
     start_date: document.getElementById("startDate").value,
     end_date: document.getElementById("endDate").value,
-    // storypoints: parseInt(document.getElementById("storypoints").value) || 0,
+    /* storypoints: parseInt(document.getElementById("storypoints").value) || 0, */
     status: document.getElementById("status").value,
     bottlenecks: document.getElementById("bottlenecks").value,
     remarks: document.getElementById("remarks").value
   };
 
- 
+
+
 if (taskId) {
 	  try {
+		  
 	    const response = await fetch(`/api/employee/updateTask/${taskId}`, {
 	      method: 'PUT',
 	      headers: { 'Content-Type': 'application/json' },
@@ -757,6 +762,7 @@ if (taskId) {
 	} else {
 	  showToast('error', '❌Invalid Task', 'Invalid Task ID');
 	}
+
 });
 
 // Optional: Clicking outside the form closes popup
