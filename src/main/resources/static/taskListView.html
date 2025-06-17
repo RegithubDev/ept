@@ -743,6 +743,15 @@ document.getElementById('editTaskForm').addEventListener('submit', function(e) {
   e.preventDefault();
   if (currentEditTaskIndex === null) return;
 
+  const status = document.getElementById('editStatus').value;
+  let completionDate = document.getElementById('editCompletionDate').value;
+
+  if (status === 'Completed' && !completionDate) {
+    const today = new Date().toISOString().split('T')[0];
+    completionDate = today;
+    document.getElementById('editCompletionDate').value = today;
+  }
+
   const updatedTask = {
     ...tasks[currentEditTaskIndex],
     description: document.getElementById('editDescription').value,
@@ -753,8 +762,8 @@ document.getElementById('editTaskForm').addEventListener('submit', function(e) {
     start_date: document.getElementById('editStartDate').value,
     end_date: document.getElementById('editEndDate').value,
     storypoints: document.getElementById('editStorypoints').value,
-    status: document.getElementById('editStatus').value,
-   completion_date: document.getElementById('editCompletionDate').value,
+    status: status,
+    completion_date: completionDate,
     priority: document.getElementById('editPriority').value,
     bottlenecks: document.getElementById('editBottlenecks').value,
     remarks: document.getElementById('editRemarks').value
