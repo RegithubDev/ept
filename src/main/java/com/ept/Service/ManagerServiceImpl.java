@@ -23,15 +23,18 @@ public class ManagerServiceImpl implements ManagerService {
 
 	         if (success) {
 	             String subject = "New Task Assigned to You";
-	             String body = "Dear " + task.getPerson() + ",\n\nA new task has been assigned to you:\n\n"
-	                         + "Description: " + task.getDescription() + "\n"
-	                         + "Priority: " + task.getPriority() + "\n"
-	                         + "Department: " + task.getDepartment() + "\n"
-	                         + "Start Date: " + task.getStart_date() + "\n"
-	                         + "End Date: " + task.getEnd_date() + "\n\n"
-	                         + "Please login to your dashboard to view more details\n."
-	                         + "Note: This is a system-generated message. Please do not reply.\n\n"
-	 		                + "Regards,\nTask Management System.";
+
+	        	 String body = "Dear " + task.getPerson() + ",\n\n"
+	        	             + "A new task has been assigned to you. Please find the task details below:\n\n"
+	        	             + "• Description : " + task.getDescription() + "\n"
+	        	             + "• Priority    : " + task.getPriority() + "\n"
+	        	             + "• Department  : " + task.getDepartment() + "\n"
+	        	             + "• Start Date  : " + task.getStart_date() + "\n"
+	        	             + "• End Date    : " + task.getEnd_date() + "\n\n"
+	        	             + "Please log in to your dashboard to view more details.\n\n"
+	        	             + "Best regards,\n"
+	        	             + "Task Management System.\n\n"
+	        	             + "Note: This is a system-generated message. Please do not reply.";
 
 	             // Send email to employee
 	             emailService.sendEmail(task.getPerson(), subject, body);
@@ -69,13 +72,15 @@ public class ManagerServiceImpl implements ManagerService {
 
 	 	    if (isUpdated) {
 	 	        String subject = "Task Updated";
+	 	        
+	 	       String body = "Dear " + updatedTask.getPerson() + ",\n\n"
+	 	              + "Your assigned task has been updated by the manager. Please find the updated details below:\n\n"
+	 	              + "• Description: " + updatedTask.getDescription() + "\n"
+	 	              + "• Status     : " + updatedTask.getStatus() + "\n\n"
+	 	              + "Best regards,\n"
+	 	              + "Task Management System.\n\n"
+	 	              + "Note: This is a system-generated message. Please do not reply.";
 
-	 	        String body = "Dear " + updatedTask.getPerson() + ",\n\n"
-	 	                    + "Your assigned task has been updated by the manager. Please check the details below:\n\n"
-	 	                    + "Description : " + updatedTask.getDescription() + "\n"
-	 	                    + "Status      : " + updatedTask.getStatus() + "\n\n"
-	 	                    + "Note: This is a system-generated message. Please do not reply.\n\n"
-	 	                    + "Regards,\nTask Management System.";
 
 	 	        // Notify employee of task update
 	 	        emailService.sendEmail(updatedTask.getPerson(), subject, body);
