@@ -738,62 +738,77 @@ function openEditTaskPopup(index) {
 function closeEditTaskPopup() {
   document.getElementById('editTaskPopup').style.display = 'none';
 }
+//Handle task edit form submission
+document.getElementById('editTaskForm').addEventListener('submit', function (e) {
+e.preventDefault();
+if (currentEditTaskIndex === null) return;
 
-document.getElementById('editTaskForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  if (currentEditTaskIndex === null) return;
+const form = this;
+const submitBtn = form.querySelector('.btn-submit');
+const originalText = submitBtn.innerText;
 
-  const status = document.getElementById('editStatus').value;
-  let completionDate = document.getElementById('editCompletionDate').value;
+// Disable button and show loading text
+submitBtn.disabled = true;
+submitBtn.innerText = "Updating...";
 
-  if (status === 'Completed' && !completionDate) {
-    const today = new Date().toISOString().split('T')[0];
-    completionDate = today;
-    document.getElementById('editCompletionDate').value = today;
-  }
+const status = document.getElementById('editStatus').value;
+let completionDate = document.getElementById('editCompletionDate').value;
 
-  const updatedTask = {
-    ...tasks[currentEditTaskIndex],
-    description: document.getElementById('editDescription').value,
-    department: document.getElementById('editDepartment').value,
-    area: document.getElementById('editArea').value,
-    sub_area: document.getElementById('editSubarea').value,
-    person: document.getElementById('editPerson').value,
-    start_date: document.getElementById('editStartDate').value,
-    end_date: document.getElementById('editEndDate').value,
-    storypoints: document.getElementById('editStorypoints').value,
-    status: status,
-    completion_date: completionDate,
-    priority: document.getElementById('editPriority').value,
-    bottlenecks: document.getElementById('editBottlenecks').value,
-    remarks: document.getElementById('editRemarks').value
-  };
+// Automatically set completion date if status is "Completed"
+if (status === 'Completed' && !completionDate) {
+ const today = new Date().toISOString().split('T')[0];
+ completionDate = today;
+ document.getElementById('editCompletionDate').value = today;
+}
+
+const updatedTask = {
+ ...tasks[currentEditTaskIndex],
+ description: document.getElementById('editDescription').value,
+ department: document.getElementById('editDepartment').value,
+ area: document.getElementById('editArea').value,
+ sub_area: document.getElementById('editSubarea').value,
+ person: document.getElementById('editPerson').value,
+ start_date: document.getElementById('editStartDate').value,
+ end_date: document.getElementById('editEndDate').value,
+ storypoints: document.getElementById('editStorypoints').value,
+ status: status,
+ completion_date: completionDate,
+ priority: document.getElementById('editPriority').value,
+ bottlenecks: document.getElementById('editBottlenecks').value,
+ remarks: document.getElementById('editRemarks').value
+};
 
 tasks[currentEditTaskIndex] = updatedTask;
 
 fetch(`/api/manager/updateTask/${updatedTask.id}`, {
-  method: 'PUT',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(updatedTask)
+ method: 'PUT',
+ headers: {
+   'Content-Type': 'application/json'
+ },
+ body: JSON.stringify(updatedTask)
 })
-.then(response => {
-  if (!response.ok) throw new Error("Failed to update task");
-  return response.text();
-})
-.then(data => {
-  showToast('success', '✅Task Updated', 'Task updated successfully.');
-  closeEditTaskPopup();
-  renderTasks();
-})
-.catch(error => {
-  console.error("Error updating task:", error);
-  showToast('error', '❌Update Failed', 'Failed to update task.');
-});
+ .then(response => {
+   if (!response.ok) throw new Error("Failed to update task");
+   return response.text();
+ })
+ .then(data => {
+   showToast('success', '✅ Task Updated', 'Task updated successfully.');
+   closeEditTaskPopup();
+   renderTasks();
+ })
+ .catch(error => {
+   console.error("Error updating task:", error);
+   showToast('error', '❌ Update Failed', 'Failed to update task.');
+ })
+ .finally(() => {
+   submitBtn.disabled = false;
+   submitBtn.innerText = originalText;
+ });
 });
 
+//Call this function initially to load tasks
 fetchTasks();
+
 
 
 </script> 
