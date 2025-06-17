@@ -712,59 +712,67 @@ function closeTaskPopup() {
 }
 
 document.getElementById("taskForm").addEventListener("submit", async function(event) {
-  event.preventDefault();
+	  event.preventDefault();
 
-  const taskId = document.getElementById("taskForm").getAttribute("data-edit-index");
+	  const form = event.target;
+	  const submitBtn = form.querySelector(".submit-btn");
+	  const originalText = submitBtn.innerText;
 
-  const taskData = {
-    id: taskId,
-    description: document.getElementById("description").value,
-    department: document.getElementById("department").value,
-    area: document.getElementById("area").value,
-    sub_area: document.getElementById("subArea").value,
-    priority: document.getElementById("priority").value,
-    person: document.getElementById("assignedTo").value,
-    start_date: document.getElementById("startDate").value,
-    end_date: document.getElementById("endDate").value,
-    /* storypoints: parseInt(document.getElementById("storypoints").value) || 0, */
-    status: document.getElementById("status").value,
-    bottlenecks: document.getElementById("bottlenecks").value,
-    remarks: document.getElementById("remarks").value
-  };
+	  // Disable button and show loading
+	  submitBtn.disabled = true;
+	  submitBtn.innerText = "Updating...";
 
+	  const taskId = form.getAttribute("data-edit-index");
 
+	  const taskData = {
+	    id: taskId,
+	    description: document.getElementById("description").value,
+	    department: document.getElementById("department").value,
+	    area: document.getElementById("area").value,
+	    sub_area: document.getElementById("subArea").value,
+	    priority: document.getElementById("priority").value,
+	    person: document.getElementById("assignedTo").value,
+	    start_date: document.getElementById("startDate").value,
+	    end_date: document.getElementById("endDate").value,
+	    status: document.getElementById("status").value,
+	    bottlenecks: document.getElementById("bottlenecks").value,
+	    remarks: document.getElementById("remarks").value
+	  };
 
-if (taskId) {
-	  try {
-		  
-	    const response = await fetch(`/api/employee/updateTask/${taskId}`, {
-	      method: 'PUT',
-	      headers: { 'Content-Type': 'application/json' },
-	      body: JSON.stringify(taskData)
-	    });
+	  if (taskId) {
+	    try {
+	      const response = await fetch(`/api/employee/updateTask/${taskId}`, {
+	        method: 'PUT',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify(taskData)
+	      });
 
-	    if (!response.ok) {
-	      throw new Error("Update failed");
+	      if (!response.ok) {
+	        throw new Error("Update failed");
+	      }
+
+	      const taskIndex = tasksInfo.findIndex(t => t.id == taskId);
+	      if (taskIndex !== -1) {
+	        tasksInfo[taskIndex] = { ...tasksInfo[taskIndex], ...taskData };
+	      }
+
+	      renderTasks(tasksInfo); // Refresh UI
+	      showToast('success', '✅ Task Updated', 'Task updated successfully.');
+	      closeTaskPopup();
+	    } catch (err) {
+	      console.error("Error updating task:", err);
+	      showToast('error', '❌ Update Failed', 'Failed to update task.');
+	    } finally {
+	      // Re-enable button and reset text
+	      submitBtn.disabled = false;
+	      submitBtn.innerText = originalText;
 	    }
-
-	    const taskIndex = tasksInfo.findIndex(t => t.id == taskId);
-	    if (taskIndex !== -1) {
-	      tasksInfo[taskIndex] = { ...tasksInfo[taskIndex], ...taskData };
-	    }
-
-	    renderTasks(tasksInfo); // Refresh UI
-	    showToast('success', '✅Task Updated', 'Task updated successfully.');
-	    closeTaskPopup();
-	  } catch (err) {
-	    console.error("Error updating task:", err);
-	    showToast('error', '❌Update Failed', 'Failed to update task.');
+	  } else {
+	    showToast('error', '❌ Invalid Task', 'Invalid Task ID');
+	    submitBtn.disabled = false;
+	    submitBtn.innerText = originalText;
 	  }
-	} else {
-	  showToast('error', '❌Invalid Task', 'Invalid Task ID');
-	}
-
-});
-
+	});
 // Optional: Clicking outside the form closes popup
 document.getElementById("taskPopup").addEventListener("click", function(e) {
   if (e.target === this) closeTaskPopup();
