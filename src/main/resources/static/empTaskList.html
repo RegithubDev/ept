@@ -593,7 +593,7 @@ function renderTasks(tasks) {
           </div>
           <div class="card-tags-right">
             <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
-            <span class="tag points">${(task.storypoints == null)?"-":(task.storypoints == 0 ?"-":task.storypoints)} pts</span>
+            // <span class="tag points">${(task.storypoints == null)?"-":(task.storypoints == 0 ?"-":task.storypoints)} pts</span>
           </div>
         </div>
         <div class="card-footer">
@@ -610,7 +610,7 @@ function renderTasks(tasks) {
       <table>
         <thead>
           <tr>
-          <th>Sl.No</th><th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>StoryPoints</th><th>Start Date</th><th>Due Date</th>
+          <th>Sl.No</th><th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Start Date</th><th>Due Date</th>
           </tr>
         </thead>
         <tbody>
@@ -621,7 +621,7 @@ function renderTasks(tasks) {
               <td>${task.department}</td>
               <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
               <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
-              <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
+              // <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
               <td>${task.start_date || '-'}</td>
               <td>${task.end_date || '-'}</td>
             </tr>
@@ -642,7 +642,7 @@ function renderTasks(tasks) {
             <th>Sub-area</th>
             <th>Priority</th>
             <th>Person</th>
-            <th>Storypoints</th>
+            // <th>Storypoints</th>
             <th>Start Date</th>
             <th>End Date</th>
             <th>Status</th>
@@ -662,7 +662,7 @@ function renderTasks(tasks) {
               <td>${task.sub_area || '-'}</td>
               <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
               <td>${task.person}</td>
-              <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
+               // <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td>
               <td>${task.start_date || '-'}</td>
               <td>${task.end_date || '-'}</td>
               <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
@@ -693,7 +693,7 @@ function openEditTaskPopup(index) {
   document.getElementById("assignedTo").value = task.person || '';
   document.getElementById("startDate").value = task.start_date || '';
   document.getElementById("endDate").value = task.end_date || '';
-  document.getElementById("storypoints").value = task.storypoints || '';
+  // document.getElementById("storypoints").value = task.storypoints || '';
   document.getElementById("status").value = task.status || '';
   document.getElementById("bottlenecks").value = task.bottlenecks || '';
   document.getElementById("remarks").value = task.remarks || '';
@@ -723,7 +723,7 @@ document.getElementById("taskForm").addEventListener("submit", async function(ev
     person: document.getElementById("assignedTo").value,
     start_date: document.getElementById("startDate").value,
     end_date: document.getElementById("endDate").value,
-    storypoints: parseInt(document.getElementById("storypoints").value) || 0,
+    // storypoints: parseInt(document.getElementById("storypoints").value) || 0,
     status: document.getElementById("status").value,
     bottlenecks: document.getElementById("bottlenecks").value,
     remarks: document.getElementById("remarks").value
