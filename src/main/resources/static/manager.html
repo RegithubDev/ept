@@ -1301,10 +1301,13 @@
         const completedTasks = validTasks.filter(task => task.status === "Completed").length;
         const notStartedTasks = validTasks.filter(task => task.status === "Not Started").length;
         const inProgressTasks = validTasks.filter(task => task.status === "In Progress").length;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // normalize to 00:00:00
+
         const overdueTasks = validTasks.filter(task =>
           task.status !== "Completed" &&
           task.end_date &&
-          new Date(task.end_date) < new Date()
+          new Date(task.end_date) < today
         ).length;
 
         // Update task cards
