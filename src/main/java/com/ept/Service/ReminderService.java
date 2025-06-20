@@ -39,13 +39,13 @@ public class ReminderService {
         List<Task> dueTomorrow = new ArrayList<>();
         List<Task> overdueTasks = new ArrayList<>();
 
-        for (Task task : tasks) {
+         for (Task task : tasks) {
             if (task.getEnd_date() == null || task.getStatus() == null) continue;
 
-            LocalDate endDate = task.getEnd_date(); // end_date is already LocalDate
+            LocalDate endDate = task.getEnd_date();
             String status = task.getStatus().trim();
 
-            if (!status.equalsIgnoreCase("Completed")) {
+            if (!status.equalsIgnoreCase("Completed") && !status.equalsIgnoreCase("Completion Request")) {
                 if (endDate.equals(today.plusDays(1))) {
                     dueTomorrow.add(task);
                 } else if (endDate.isBefore(today)) {
