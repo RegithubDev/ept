@@ -1076,7 +1076,12 @@
     </div>
 
     <div class="dashboard-row">
-      <div class="task-card yellow">
+
+	     <div class="task-card orange" >
+        <h3 id="CompletionRequestTasks">0</h3>
+        <i class="fas fa-clock fa-spin"></i> Completion Request
+      </div>
+      <div class="task-card yellow" style=" margin-left: -1.5rem;">
         <h3 id="OverDueTasks">0</h3>
         <i class="fas fa-hourglass-end fa-bounce"></i> Overdue
       </div>
@@ -1301,6 +1306,7 @@
         const completedTasks = validTasks.filter(task => task.status === "Completed").length;
         const notStartedTasks = validTasks.filter(task => task.status === "Not Started").length;
         const inProgressTasks = validTasks.filter(task => task.status === "In Progress").length;
+	const completionRequestTasks = validTasks.filter(task => task.status == "Completion Request").length;
         const today = new Date();
         today.setHours(0, 0, 0, 0); // normalize to 00:00:00
 
@@ -1314,7 +1320,8 @@
         document.querySelector('.task-card h3').textContent = totalTasks;
         document.querySelectorAll('.task-card')[1].querySelector('h3').textContent = completedTasks;
         document.querySelectorAll('.task-card')[2].querySelector('h3').textContent = inProgressTasks;
-        document.querySelectorAll('.task-card')[3].querySelector('h3').textContent = notStartedTasks;    
+        document.querySelectorAll('.task-card')[3].querySelector('h3').textContent = notStartedTasks;
+	document.querySelectorAll('.task-card')[4].querySelector('h3').textContent = completionRequestTasks;      
         document.getElementById('OverDueTasks').textContent = overdueTasks;
 
         // Calculate and render team task completion
