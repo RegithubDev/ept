@@ -1080,6 +1080,16 @@ async function submitTask(event) {
 	    form.reportValidity();
 	    return;
 	  }
+	// Email validation
+	  const personEmail = document.getElementById('person').value.trim();
+	 // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	 const emailRegex = /^[^\s@]+@resustainability\.com$/;
+
+
+	  if (!emailRegex.test(personEmail)) {
+	    showToast('error', '❌ Invalid Email', 'Please enter a valid email address in "Person" field.');
+	    return;
+	  }
 
 	  // Disable button and show loading text
 	  submitBtn.disabled = true;
