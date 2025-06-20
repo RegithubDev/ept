@@ -794,7 +794,7 @@
         
         <div class="form-group" style="position: relative;">
           <label for="person">Person:</label>
-          <input type="text" id="person" name="person" placeholder="Enter Your MailId" autocomplete="off" required>
+          <input type="text" id="person" name="person" placeholder="Enter Your MailId" autocomplete="off" disabled>
         </div>
         </div>
         <div class="form-row">
@@ -1063,8 +1063,19 @@ taskChart = new Chart(ctx, {
 });
 
 function openTaskPopup() {
-  document.getElementById('addTaskPopup').style.display = 'flex';
-}
+	  // Show the popup
+	  document.getElementById('addTaskPopup').style.display = 'flex';
+
+	  // Get email from localStorage and set it to the person input field
+	  const empEmail = localStorage.getItem('EmpEmail');
+	  if (empEmail) {
+	    document.getElementById('person').value = empEmail;
+	  }
+	}
+
+	function closeTaskPopup() {
+	  document.getElementById('addTaskPopup').style.display = 'none';
+	}
 
 function closeTaskPopup() {
   document.getElementById('addTaskPopup').style.display = 'none';
