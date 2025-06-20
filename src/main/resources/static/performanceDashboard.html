@@ -88,10 +88,10 @@
 <body>
 <header class="header">
   <div class="d-flex align-items-center gap-2">
-    <!-- Back Button -->
-  <!--  <a href="/dashboard/manager" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
-    <i class="fa-solid fa-arrow-left"></i>
-  </a> -->
+<!-- Back Button -->
+<a id="backBtn" style="color: #1e40af; font-size: 1.2rem; text-decoration: none; cursor: pointer;">
+  <i class="fa-solid fa-arrow-left"></i>
+</a>
     <!-- Dashboard Icon -->
     <i class="fa-solid fa-chart-column text-primary"></i>
 <h2 class="mb-0 fs-6 fw-bold">Performance Dashboard</h2>
@@ -103,11 +103,6 @@
     <i class="fa-solid fa-right-from-bracket"></i> Logout
   </a>
 </header>
-
-
-
-
-
 
 <!--    <div class="row">
       <div class="col-md-4 mb-1">
@@ -161,12 +156,22 @@
   width="100%" 
   height="100%"   
   src="https://app.powerbi.com/view?r=eyJrIjoiMmJjZWM2MmMtYjljMC00N2VlLTljOTktMjEyMjk1MTYxZGJmIiwidCI6ImM5MzA2NWY5LTg1ODctNGJmYy05YjQzLWMyYWZhMGRjNTY1MCJ9">
-</iframe>
-  
+</iframe>  
 </div>
-
-
   <script>
+	   document.getElementById("backBtn").addEventListener("click", function () {
+	  const role = localStorage.getItem("EmpRole"); // Use "EmpRole", not "userRole"
+	  console.log("Role:", role);
+
+	  if (role === "manager") {
+	    window.location.href = "/dashboard/manager";
+	  } else if (role === "employee") {
+	    window.location.href = "/dashboard/employee";
+	  } else {
+	    window.location.href = "/login"; // fallback
+	  }
+	});
+	  
     window.onload = function () {
       const ctxStatus = document.getElementById('statusChart').getContext('2d');
       new Chart(ctxStatus, {
