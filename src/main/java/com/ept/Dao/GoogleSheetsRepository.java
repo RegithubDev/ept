@@ -467,42 +467,52 @@ public class GoogleSheetsRepository {
 		    }
 		    
 		    
-		    public List<Employees> allEmployees() {
-		        try {
-		            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsThird());
-
-		            ValueRange response = sheetsService.spreadsheets().values()
-		                    .get(sheetProperties.getEmpid(), "Employees.Resustainability") // Sheet name or range
+		     public List<Employees> allEmployees() {
+		        int retries = 3;
+		        for (int i = 0; i < retries; i++) {
+		            try {
+		                Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsThird());
+		                ValueRange response = sheetsService.spreadsheets().values()
+		                    .get(sheetProperties.getEmpid(), "Employees.Resustainability")
 		                    .execute();
 
-		            List<List<Object>> values = response.getValues();
-		            List<Employees> employees = new ArrayList<>();
+		                List<List<Object>> values = response.getValues();
+		                List<Employees> employees = new ArrayList<>();
 
-		            if (values == null || values.size() <= 1) {
-		                return employees; // Return empty if no data or only header
-		            }
-
-		            for (int i = 1; i < values.size(); i++) { // Skip header row
-		                List<Object> row = values.get(i);
-
-		                // Ensure both ID and email are present
-		                if (row.size() < 2 || row.get(1).toString().trim().isEmpty()) {
-		                    continue; // Skip incomplete row
+		                if (values == null || values.size() <= 1) {
+		                    return employees; // Only header or no data
 		                }
 
-		                Employees emp = new Employees();
-		                emp.setId(row.size() > 0 ? Long.parseLong(row.get(0).toString()) : null); // First column = ID
-		                emp.setEmail(row.get(1).toString()); // Second column = Email
-                        emp.setRole(row.get(2).toString()); // Third column = Role
-		                employees.add(emp);
+		                for (int j = 1; j < values.size(); j++) { // Skip header
+		                    List<Object> row = values.get(j);
+		                    if (row.size() < 2 || row.get(1).toString().trim().isEmpty()) continue;
+
+		                    Employees emp = new Employees();
+		                    emp.setId(row.size() > 0 ? Long.parseLong(row.get(0).toString()) : null);
+		                    emp.setEmail(row.get(1).toString());
+		                    emp.setRole(row.get(2).toString());
+
+		                    employees.add(emp);
+		                }
+
+		                return employees;
+
+		            } catch (com.google.api.client.googleapis.json.GoogleJsonResponseException e) {
+		                if (e.getStatusCode() == 503 && i < retries - 1) {
+		                    System.out.println("Google Sheets API 503 error. Retrying... (" + (i + 1) + ")");
+		                    try {
+		                        Thread.sleep(2000);
+		                    } catch (InterruptedException ignored) {}
+		                } else {
+		                    e.printStackTrace();
+		                    return Collections.emptyList();
+		                }
+		            } catch (Exception e) {
+		                e.printStackTrace();
+		                return Collections.emptyList();
 		            }
-
-		            return employees;
-
-		        } catch (Exception e) {
-		            e.printStackTrace();
-		            return Collections.emptyList();
 		        }
+		        return Collections.emptyList();
 		    }
 		    
 		    public boolean updateUserPassword(String email, String newPassword) {
