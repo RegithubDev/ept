@@ -14,7 +14,7 @@ services:
       - key: GOOGLE_SHEET_TASKSID
         value: 1sMjUrZBEJqHbEdjZWe25_cQGnW86S-qSOwV92wEqPXw
       - key: GOOGLE_SHEET_TASKSRANGE
-        value: Tasks.Resustainability!A:M
+        value: Tasks.Resustainability!A:N
       - key: GOOGLE_SHEET_EMPID
         value: 1gSMiglIfJD6VyBEp9VU0wntP2MJ0L9unxvRGdMi8-38
       - key: GOOGLE_SHEET_EMPRANGE
