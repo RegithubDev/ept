@@ -812,7 +812,7 @@ fetch(`/api/manager/updateTask/${updatedTask.id}`, {
 //Call this function initially to load tasks
 fetchTasks();
 
-   async function confirmDeleteTask(taskId) {
+  async function confirmDeleteTask(taskId) {
 		  const result = await Swal.fire({
 		    title: `Delete Task ID: ${taskId}?`,
 		    text: "This action cannot be undone.",
@@ -846,9 +846,7 @@ fetchTasks();
 	  }
 	}
 
-
-
 </script> 
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
