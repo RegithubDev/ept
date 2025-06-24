@@ -469,7 +469,7 @@ public class GoogleSheetsRepository {
 		    }
 		    
 		    
-		     public List<Employees> allEmployees() {
+		    public List<Employees> allEmployees() {
 		        int retries = 3;
 		        for (int i = 0; i < retries; i++) {
 		            try {
@@ -492,7 +492,8 @@ public class GoogleSheetsRepository {
 		                    Employees emp = new Employees();
 		                    emp.setId(row.size() > 0 ? Long.parseLong(row.get(0).toString()) : null);
 		                    emp.setEmail(row.get(1).toString());
-		                    emp.setRole(row.get(2).toString());
+		                    emp.setRole(row.size() > 2 ? row.get(2).toString() : null);
+		                    emp.setDepartment(row.size() > 3 ? row.get(3).toString() : null);  // New line added
 
 		                    employees.add(emp);
 		                }
