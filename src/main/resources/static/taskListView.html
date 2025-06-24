@@ -665,6 +665,9 @@ function renderTasks() {
                 <button class="edit-btn" title="Edit" style="background:none; border:none; cursor:pointer;" onclick="openEditTaskPopup(${task.id})">
                   <i class="fa fa-pen"></i>
                 </button>
+                 <button class="delete-btn" title="Delete" onclick="confirmDeleteTask(${task.id})">
+                <i class="fa fa-trash" style="color:red;"></i>
+              </button>
               </td>
             </tr>
           `).join("")}
@@ -808,6 +811,40 @@ fetch(`/api/manager/updateTask/${updatedTask.id}`, {
 
 //Call this function initially to load tasks
 fetchTasks();
+
+   async function confirmDeleteTask(taskId) {
+		  const result = await Swal.fire({
+		    title: `Delete Task ID: ${taskId}?`,
+		    text: "This action cannot be undone.",
+		    icon: 'warning',
+		    width: '400px', 
+		    showCancelButton: true,
+		    confirmButtonColor: '#d33',
+		    cancelButtonColor: '#3085d6',
+		    confirmButtonText: 'Yes, delete it!',
+		    cancelButtonText: 'Cancel'
+		  });
+
+		  if (!result.isConfirmed) return;
+
+	  try {
+	    const response = await fetch(`/api/manager/delete/${taskId}`, {
+	      method: 'DELETE'
+	    });
+
+	    const result = await response.text();
+
+	    if (response.ok) {
+	      showToast('success', '✅ Task Deleted', result);
+	      fetchTasks(); // refresh task list
+	    } else {
+	      showToast('error', '❌ Delete Failed', result || 'Failed to delete task');
+	    }
+	  } catch (err) {
+	    console.error('Delete error:', err);
+	    showToast('error', '❌ Delete Error', err.message || 'An error occurred');
+	  }
+	}
 
 
 
