@@ -90,5 +90,17 @@ public class ManagerServiceImpl implements ManagerService {
 
 	 	    return "Failed to update task.";
 	 	}
+
+	        @Override
+	 	public String delById(Long id) {
+	 	    String result = googleSheetsRepository.deleteById(id);
+
+	 	    if (result.toLowerCase().contains("success")) {
+	 	        return "✅ Task deleted successfully.";
+	 	    } else {
+	 	        return "❌ Failed to delete task: " + result;
+	 	    }
+
+	 	}
 	
 }
