@@ -569,6 +569,69 @@ public class GoogleSheetsRepository {
 		        }
 		    }
 		
+                  public String deleteById(Long id) {
+		        try {
+		            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsSecond());
+		            String spreadsheetId = sheetProperties.getTasksid();
+		            String sheetName = "Tasks.Resustainability";
+
+		            // Step 1: Fetch existing rows (excluding header)
+		            ValueRange response = sheetsService.spreadsheets().values()
+		                    .get(spreadsheetId, sheetName + "!A2:Z")
+		                    .execute();
+
+		            List<List<Object>> rows = response.getValues();
+
+		            if (rows == null || rows.isEmpty()) {
+		                return "No tasks found.";
+		            }
+
+		            // Step 2: Identify and remove the row with matching task ID
+		            boolean deleted = false;
+		            for (int i = 0; i < rows.size(); i++) {
+		                List<Object> row = rows.get(i);
+		                if (!row.isEmpty()) {
+		                    try {
+		                        Long taskId = Long.parseLong(row.get(0).toString());
+		                        if (taskId.equals(id)) {
+		                            rows.remove(i);
+		                            deleted = true;
+		                            break;
+		                        }
+		                    } catch (NumberFormatException ignored) {
+		                    }
+		                }
+		            }
+
+		            if (!deleted) {
+		                return "Task with ID " + id + " not found.";
+		            }
+
+		            // Step 3: Reassign IDs (column A) starting from 1
+		            for (int i = 0; i < rows.size(); i++) {
+		                if (!rows.get(i).isEmpty()) {
+		                    rows.get(i).set(0, String.valueOf(i + 1)); // ID in column A
+		                }
+		            }
+
+		            // Step 4: Clear existing data (excluding header row)
+		            sheetsService.spreadsheets().values()
+		                    .clear(spreadsheetId, sheetName + "!A2:Z", new ClearValuesRequest())
+		                    .execute();
+
+		            // Step 5: Write back the updated rows with reassigned IDs
+		            ValueRange updatedBody = new ValueRange().setValues(rows);
+		            sheetsService.spreadsheets().values()
+		                    .update(spreadsheetId, sheetName + "!A2", updatedBody)
+		                    .setValueInputOption("RAW")
+		                    .execute();
+
+		            return "Task deleted successfully.";
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		            return "Error while deleting task: " + e.getMessage();
+		        }
+		    }
 
 		    
 	
