@@ -5,6 +5,7 @@ public class Employees {
 	private Long id;
 	private String email;
 	private String role;
+	private String department;
 	
 	public Long getId() {
 		return id;
@@ -29,7 +30,13 @@ public class Employees {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
 	
 
 }
