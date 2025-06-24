@@ -1340,65 +1340,63 @@
       // Placeholder for task rendering if needed
     }
 
-    // Function to calculate and render team task completion
-    function renderTeamCompletion(tasks) {
-      const departments = ['IT', 'SAP', 'FINANCE', 'HR']; // Match department names from form
-      const completionList = document.querySelector('.completion-list');
+     function renderTeamCompletion(tasks) {
+    	  const completionList = document.querySelector('.completion-list');
+    	  completionList.innerHTML = ''; // Clear existing
 
-      // Clear existing content
-      completionList.innerHTML = '';
+    	  // Dynamically get unique departments from task data
+    	  const departments = [...new Set(tasks.map(task => task.department).filter(Boolean))];
 
-      // Calculate completion for each department
-      departments.forEach(dept => {
-        const deptTasks = tasks.filter(task => task.department === dept);
-        const totalDeptTasks = deptTasks.length;
-        const completedDeptTasks = deptTasks.filter(task => task.status === "Completed").length;
-        const completionPercentage = totalDeptTasks > 0 
-          ? ((completedDeptTasks / totalDeptTasks) * 100).toFixed(1) 
-          : 0;
+    	  // For each department, calculate and render completion
+    	  departments.forEach(dept => {
+    	    const deptTasks = tasks.filter(task => task.department === dept);
+    	    const totalDeptTasks = deptTasks.length;
+    	    const completedDeptTasks = deptTasks.filter(task => task.status === "Completed").length;
+    	    const completionPercentage = totalDeptTasks > 0 
+    	      ? ((completedDeptTasks / totalDeptTasks) * 100).toFixed(1) 
+    	      : 0;
 
-        // Create completion row
-        const row = document.createElement('div');
-        row.className = 'completion-row';
-        row.innerHTML = `
-          <div class="team-name">${dept} team</div>
-          <div class="completion-bar">
-            <div class="bar-inner" style="width:${completionPercentage}%"></div>
-          </div>
-          <div class="percent">${completionPercentage}%</div>
-        `;
-        completionList.appendChild(row);
-      });
+    	    const row = document.createElement('div');
+    	    row.className = 'completion-row';
+    	    row.innerHTML = `
+    	      <div class="team-name">${dept} team</div>
+    	      <div class="completion-bar">
+    	        <div class="bar-inner" style="width:${completionPercentage}%"></div>
+    	      </div>
+    	      <div class="percent">${completionPercentage}%</div>
+    	    `;
+    	    completionList.appendChild(row);
+    	  });
 
-      // Calculate Weekly Goals (tasks due this week)
-      const today = new Date();
-      const startOfWeek = new Date(today);
-      startOfWeek.setDate(today.getDate() - today.getDay()); // Start of current week (Sunday)
-      const endOfWeek = new Date(today);
-      endOfWeek.setDate(today.getDate() - today.getDay() + 6); // End of current week (Saturday)
+    	  // Weekly Goals
+    	  const today = new Date();
+    	  const startOfWeek = new Date(today);
+    	  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+    	  const endOfWeek = new Date(today);
+    	  endOfWeek.setDate(today.getDate() - today.getDay() + 6); // Saturday
 
-      const weeklyTasks = tasks.filter(task => {
-        const endDate = new Date(task.end_date);
-        return endDate >= startOfWeek && endDate <= endOfWeek;
-      });
-      const totalWeeklyTasks = weeklyTasks.length;
-      const completedWeeklyTasks = weeklyTasks.filter(task => task.status === "Completed").length;
-      const weeklyPercentage = totalWeeklyTasks > 0 
-        ? ((completedWeeklyTasks / totalWeeklyTasks) * 100).toFixed(1) 
-        : 0;
+    	  const weeklyTasks = tasks.filter(task => {
+    	    const endDate = new Date(task.end_date);
+    	    return endDate >= startOfWeek && endDate <= endOfWeek;
+    	  });
+    	  const totalWeeklyTasks = weeklyTasks.length;
+    	  const completedWeeklyTasks = weeklyTasks.filter(task => task.status === "Completed").length;
+    	  const weeklyPercentage = totalWeeklyTasks > 0 
+    	    ? ((completedWeeklyTasks / totalWeeklyTasks) * 100).toFixed(1) 
+    	    : 0;
 
-      // Add Weekly Goals row
-      const weeklyRow = document.createElement('div');
-      weeklyRow.className = 'completion-row';
-      weeklyRow.innerHTML = `
-        <div class="team-name">Weekly Goals</div>
-        <div class="completion-bar">
-          <div class="bar-inner goal" style="width:${weeklyPercentage}%; background:#ffb300;"></div>
-        </div>
-        <div class="percent">${weeklyPercentage}%</div>
-      `;
-      completionList.appendChild(weeklyRow);
-    }
+    	  const weeklyRow = document.createElement('div');
+    	  weeklyRow.className = 'completion-row';
+    	  weeklyRow.innerHTML = `
+    	    <div class="team-name">Weekly Goals</div>
+    	    <div class="completion-bar">
+    	      <div class="bar-inner goal" style="width:${weeklyPercentage}%; background:#ffb300;"></div>
+    	    </div>
+    	    <div class="percent">${weeklyPercentage}%</div>
+    	  `;
+    	  completionList.appendChild(weeklyRow);
+    	}
+
 
     function startAutoRefresh() {
       fetchTasks(); 
