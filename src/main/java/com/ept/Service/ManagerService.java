@@ -16,4 +16,6 @@ public interface ManagerService {
 	Task getTaskById(Long id);
 	
 	String update(Long id ,Task task);
+	
+	String delById(Long id);
 }
