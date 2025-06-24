@@ -569,7 +569,7 @@ public class GoogleSheetsRepository {
 		        }
 		    }
 		
-                  public String deleteById(Long id) {
+                     public String deleteById(Long id) {
 		        try {
 		            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsSecond());
 		            String spreadsheetId = sheetProperties.getTasksid();
@@ -632,9 +632,6 @@ public class GoogleSheetsRepository {
 		            return "Error while deleting task: " + e.getMessage();
 		        }
 		    }
-
-		    
-	
 	
 		/*---------- Utility Methods-----------------*/
 		
