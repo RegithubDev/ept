@@ -18,7 +18,7 @@ services:
       - key: GOOGLE_SHEET_EMPID
         value: 1gSMiglIfJD6VyBEp9VU0wntP2MJ0L9unxvRGdMi8-38
       - key: GOOGLE_SHEET_EMPRANGE
-        value: Employees.Resustainability!A:C
+        value: Employees.Resustainability!A:D
       - key: GOOGLE_SHEET_CREDENTIALS_FIRST
         value: src/main/resources/my-project-ept-new-42ae1c1963d4.json
       - key: GOOGLE_SHEET_CREDENTIALS_SECOND
