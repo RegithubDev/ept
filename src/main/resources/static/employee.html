@@ -766,10 +766,10 @@
             <label for="department">Department:</label>
             <select id="department" name="department" required>
               <option value="">Select Department</option>
-              <option value="IT"> IT </option>
+           <!--   <option value="IT"> IT </option>
               <option value="SAP"> SAP </option>
               <option value="FINANCE"> FINANCE </option>
-              <option value="HR"> HR </option>
+              <option value="HR"> HR </option> -->
             </select> 
           </div>
         <div class="form-group">
@@ -1061,6 +1061,40 @@ taskChart = new Chart(ctx, {
     }
   }
 });
+
+	async function populateDepartmentsDropdown() {
+	  const dropdown = document.getElementById("department");
+	  dropdown.innerHTML = '<option value="">Select Department</option>'; // Reset
+
+	  try {
+	    const response = await fetch("/api/users/employees");
+	    const employees = await response.json();
+
+	    // Extract and deduplicate departments
+	    const departments = [...new Set(
+	      employees
+	        .map(emp => emp.department?.trim().toUpperCase()) // normalize
+	        .filter(dept => dept) // remove null/undefined/empty
+	    )];
+
+	    // Optional: Sort alphabetically
+	    departments.sort();
+
+	    departments.forEach(dept => {
+	      const option = document.createElement("option");
+	      option.value = dept;
+	      option.textContent = dept;
+	      dropdown.appendChild(option);
+	    });
+
+	  } catch (err) {
+	    console.error("Failed to load departments:", err);
+	  }
+	}
+
+	// Call this when the page or form loads
+	document.addEventListener("DOMContentLoaded", populateDepartmentsDropdown);
+
 
 	
 function openTaskPopup() {
