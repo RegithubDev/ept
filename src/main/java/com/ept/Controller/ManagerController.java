@@ -38,7 +38,7 @@ public class ManagerController {
 		return taskService.getAllUsers();
 	}
 
-    @GetMapping("/getTask/{id}")
+       @GetMapping("/getTask/{id}")
 	public Object getTaskById(@PathVariable Long id) {
 	  Task task = taskService.getTaskById(id);	  
 	  if (task == null) { 		  
@@ -50,6 +50,11 @@ public class ManagerController {
 	@PutMapping("/updateTask/{id}")
 	public String updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
 		return taskService.update(id, updatedTask);
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public String deleteTaskById(@PathVariable Long id) {
+	    return taskService.delById(id);
 	}
 	
 }
