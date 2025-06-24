@@ -469,7 +469,7 @@ public class GoogleSheetsRepository {
 		    }
 		    
 		    
-		    public List<Employees> allEmployees() {
+		   public List<Employees> allEmployees() {
 		        int retries = 3;
 		        for (int i = 0; i < retries; i++) {
 		            try {
@@ -517,6 +517,7 @@ public class GoogleSheetsRepository {
 		        }
 		        return Collections.emptyList();
 		    }
+
 		    
 		    public boolean updateUserPassword(String email, String newPassword) {
 		        try {
