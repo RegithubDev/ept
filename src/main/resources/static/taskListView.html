@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +26,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
+      border: 1px solid #ccc;
     }
     button.active, select.active {
       background: #1e40af;
@@ -76,15 +76,20 @@
       display: inline-block;
       background: #ffff008c;
     }
+    /* .tag.high { background: #c0c32c57; color: #1e40af; } */ /* Blue for high */
     .tag.high { background: #fde2e2; color: #b91c1c; }
+    /* .tag.medium { background: #e9d5ff; color: #6b21a8; } */ /* Purple for medium */
     .tag.medium { background: #fff3cd; color: #856404; }
+    /* .tag.low { background: #cf17a647; color: #1e40af; } */ /* Blue for low */
     .tag.low { background: #d4edda; color: #155724; }
     .tag.not-started { background: #da0d1494; color: #212529; }
-    .tag.in-progress { background: #fff3cd; color: #212529; }
+   /*  .tag.in-progress { background: #f5b276; color: #212529; } */
+   .tag.in-progress { background: #fff3cd; color: #212529; }
     .tag.blocked { background:#cf22ef7a; color: #212529; width: 63px;}
     .tag.completed { background: #d4edda; color: #155724; }      
     .tag.points { background: #e0e7ff; color: #3730a3; }
     .tag.area { background: #f0f0f0; color: #333; }
+    
     table {
       width: 100%;
       border-collapse: collapse;
@@ -137,7 +142,7 @@
         align-items: center;
         order: 1;
         margin-left: 54rem;
-        margin-top: -4.8rem;
+        margin-top: -2.8rem;
       }
       .top-controls select,
       .top-controls input {
@@ -402,11 +407,24 @@
       100% { opacity: 0; transform: translateY(-20px); }
     }
     
+    .status-filter select {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #eef2ff;
+  color: #000;
+  cursor: pointer;
+  outline: none;
+}
+
+.status-filter select:focus {
+  border-color: #999;
+}
     
-  </style>  
+  </style>    
 </head>
 <body>
-
 <div id="toast-container" class="toast-container"></div>
 
 <header style="background-color: #eae6ff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: -0.9rem;">
@@ -417,7 +435,7 @@
     <i class="fa-solid fa-clipboard-list" style="color: #1e40af; font-size: 1.2rem;"></i>
     <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Task List View</h2>
   </div>
-  <a href="/" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
+  <a href="/login" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
     <i class="fas fa-power-off"></i> Logout
   </a>
 </header>
@@ -434,14 +452,18 @@
     </button>
     <input type="text" id="searchBox" placeholder="Search tasks..." />
   </div>
-  <div class="status-buttons">
-    <button class="status-btn active" data-status="All">All</button>
-    <button class="status-btn" data-status="Blocked">Blocked</button>
-    <button class="status-btn" data-status="Not Started">Not Started</button>
-    <button class="status-btn" data-status="In Progress">In Progress</button>
-    <button class="status-btn" data-status="Completion Request">Completion Request</button>
-    <button class="status-btn" data-status="Completed">Completed</button>
-  </div>
+<!-- Status Filter Dropdown -->
+<div class="status-filter">
+  <select id="statusDropdown" onchange="handleStatusDropdownChange(this.value)">
+  <option value="All">All</option>
+  <option value="Blocked">Blocked</option>
+  <option value="Not Started">Not Started</option>
+  <option value="In Progress">In Progress</option>
+  <option value="Completion Request">Completion Request</option>
+  <option value="Completed">Completed</option>
+</select>
+
+</div>
 </div>
 
 <div id="editTaskPopup" class="popup-overlay" style="display: none;">
@@ -451,23 +473,23 @@
       <div class="edit-grid">
         <div>
           <label>Description:</label>
-          <input type="text" id="editDescription" required />
+          <input type="text" id="editDescription" />
         </div>
         <div>
           <label>Department:</label>
-          <input type="text" id="editDepartment" required />
+          <input type="text" id="editDepartment" />
         </div>
         <div>
           <label>Area:</label>
-          <input type="text" id="editArea"  />
+          <input type="text" id="editArea" />
         </div>
         <div>
           <label>Sub-area:</label>
-          <input type="text" id="editSubarea"  />
+          <input type="text" id="editSubarea" />
         </div>
         <div>
           <label>Person:</label>
-          <input type="text" id="editPerson" required />
+          <input type="text" id="editPerson" />
         </div>
         <div>
           <label>Start Date:</label>
@@ -485,14 +507,14 @@
           <label>Status:</label>
           <select id="editStatus" required>
             <option>Not Started</option>
-          <!--  <option>Pending</option> -->
+             <option>Pending</option>
             <option>In Progress</option>
             <option>Completed</option>
           </select>
         </div>
         <div>
           <label>Priority:</label>
-          <input type="text" id="editPriority" required />
+          <input type="text" id="editPriority"  />
         </div>
         <div>
           <label>Bottlenecks:</label>
@@ -553,7 +575,10 @@ function showToast(type, title, message) {
         }
     }, 5000);
 }
-
+ function handleStatusDropdownChange(selectedStatus) {
+   currentStatus = selectedStatus;
+   renderTasks();
+} 
 
 let tasks = [];
 let currentView = "Cards";
