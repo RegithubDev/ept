@@ -26,6 +26,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
+      border: 1px solid #ccc;
     }
     button.active, select.active {
       background: #1e40af;
@@ -138,7 +139,7 @@
         align-items: center;
         order: 1; /* Comes after status buttons */
         margin-left: 29rem;
-        margin-top: -0.8rem;
+       
       }
       .top-controls select,
       .top-controls input {
@@ -327,8 +328,7 @@
       .popup-form .form-grid {
         grid-template-columns: 1fr; /* keep 1 column for narrow screens */
       }
-    }
-    
+    }    
      .toast-container {
       position: fixed;
       top: 20px;
@@ -338,7 +338,6 @@
       flex-direction: column;
       align-items: flex-end;
     }
-
     .toast {
       position: relative;
       min-width: 250px;
@@ -398,15 +397,28 @@
       100% { opacity: 0; transform: translateY(-20px); }
     }
     
-    
-    
+ .status-filter select {
+  width: 190px;             
+  padding: 6px;             
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #eef2ff;
+  color: #000;
+  cursor: pointer;
+  outline: none;
+  text-align: left;         
+  text-indent: 0px;         
+}
+
+.status-filter select:focus {
+  border-color: #999;
+}    
   </style>
 </head>
-
 <body>
 
 <div id="toast-container" class="toast-container"></div>
-
 
 <header style="background-color: #eae6ff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: -0.9rem;">
   <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -433,12 +445,17 @@
     </button>
     <input type="text" id="searchBox" placeholder="Search tasks..." />
   </div>
-  <div class="status-buttons" style="display: flex; gap: 0.5rem; flex-wrap: nowrap;">
-    <button class="status-btn active" data-status="All">All</button>
-    <button class="status-btn" data-status="Not started">Not started</button>
-    <button class="status-btn" data-status="In Progress">In Progress</button>
-    <button class="status-btn" data-status="Completed">Completed</button>
-  </div>
+  <div class="status-filter">
+  <select id="statusDropdown" onchange="handleStatusChange(this.value)">
+    <option value="All">All</option>
+    <option value="Blocked">Blocked</option>
+    <option value="Not started">Not started</option>
+    <option value="In Progress">In Progress</option>
+    <option value="Completed">Completed</option>
+    <option value="Completion Request">Completion Request</option>
+  </select>
+</div>
+
 </div>
 
 <div id="task-container"></div>
@@ -547,7 +564,11 @@ function showToast(type, title, message) {
     }, 2000);
 }
 
-
+function handleStatusChange(selectedStatus) {
+ currentStatus = selectedStatus;
+ renderTasks(tasksInfo);
+}
+	
 let tasksInfo = [];
 
 function fetchTasks() {
