@@ -422,48 +422,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+function deleteUser(email) {
+		  Swal.fire({
+		    title: `Are you sure you want to delete ${email}?`,
+		    icon: 'warning',
+		    showCancelButton: true,
+		    confirmButtonColor: '#d33',
+		    cancelButtonColor: '#3085d6',
+		    confirmButtonText: 'Yes, delete it!',
+		    customClass: {
+		      popup: 'small-popup',
+		      title: 'small-title',
+		      confirmButton: 'small-btn',
+		      cancelButton: 'small-btn',
+		      icon: 'smaller-icon'
+		    }
+		  }).then((result) => {
+		    if (result.isConfirmed) {
+		      
+		      showToast("info", "⏳ Deleting...", "Please wait while we delete the employee.");
 
-
- function deleteUser(email) {
-	  Swal.fire({
-	    title: `Are you sure you want to delete ${email}?`,
-	    icon: 'warning',
-	    showCancelButton: true,
-	    confirmButtonColor: '#d33',
-	    cancelButtonColor: '#3085d6',
-	    confirmButtonText: 'Yes, delete it!',
-	    customClass: {
-	      popup: 'small-popup',
-	      title: 'small-title',
-	      confirmButton: 'small-btn',
-	      cancelButton: 'small-btn',
-	      icon: 'smaller-icon'
-	    }
-	  }).then((result) => {
-	    if (result.isConfirmed) {
-	      //  Show toast immediately on confirm
-	      showToast("info", "⏳ Deleting...", "Please wait while we delete the employee.");
-
-	      //  Proceed with API call
-	      fetch(`/api/manager/deleteUser/${encodeURIComponent(email)}`, {
-	        method: "DELETE"
-	      })
-	      .then(response => {
-	        if (!response.ok) throw new Error("Failed to delete user");
-	        return response.json();
-	      })
-	      .then(data => {
-	        // Optional: second confirmation toast
-	        showToast("success", "✅ Deleted!", "Employee Deleted Successfully");
-	        setTimeout(() => location.reload(), 1500); // Allow toast to show before reload
-	      })
-	      .catch(err => {
-	        showToast("error", "❌ Failed", "Failed To Delete Employee");
-	      });
-	    }
-	  });
-	}
-
+		      fetch(`/api/manager/deleteUser/${encodeURIComponent(email)}`, {
+		        method: "DELETE"
+		      })
+		      .then(response => {
+		        if (!response.ok) throw new Error(); // no need to read body
+		        showToast("success", "✅ Deleted!", "Employee Deleted Successfully.");
+		        setTimeout(() => location.reload(), 1500);
+		      })
+		      .catch(() => {
+		        showToast("error", "❌ Failed", "Failed to delete employee. Please try again.");
+		      });
+		    }
+		  });
+		}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
