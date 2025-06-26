@@ -157,12 +157,125 @@
         min-height: auto;
       }
     }
+    
+       
+    .delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: #a71d2a;
+}
+   
+  /* Reduce icon size */
+.smaller-icon .swal2-icon {
+  font-size: 50px !important;
+  width: 60px !important;
+  height: 60px !important;
+  line-height: 60px !important;
+}
+
+.small-popup {
+  font-size: 15px !important;
+  width: 360px !important;
+}
+
+.small-title {
+  font-size: 15px !important;
+}
+
+
+.bigger-btn {
+  font-size: 14px !important;
+  padding: 8px 16px !important;
+}
+
+ .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .toast {
+      position: relative;
+      min-width: 250px;
+      max-width: 350px;
+      background-color: white;
+      color: #333;
+      padding: 12px 40px 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      animation: fadeInOut 5s forwards;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      border-left: 4px solid transparent;
+    }
+
+    .toast.success {
+      border-left-color: #4caf50;
+    }
+
+    .toast.error {
+      border-left-color: #f44336;
+    }
+
+    .toast.info {
+      border-left-color: #2196f3;
+    }
+
+    .toast-title {
+      font-weight: bold;
+      margin-bottom: 2px;
+      color: #333;
+    }
+
+    .toast-message {
+      color: #666;
+    }
+
+    .toast-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
+     
+
   </style>
 </head>
 <body>
 
+<div id="toast-container" class="toast-container"></div>
+
+
   <!-- Global Header -->
- <header style="background-color: #eae6ff;padding: 1rem;display: flex;justify-content: space-between;align-items: center;margin-top: -0.9rem;margin-left: 0rem;width: 83rem;">
+ <header style="background-color: #eae6ff;padding: 1rem;display: flex;justify-content: space-between;align-items: center;margin-top: -0.9rem;margin-left: 1rem;width: 81rem;">
   <div style="display: flex; align-items: center; gap: 0.5rem;">
     <a href="/dashboard/manager" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
       <i class="fa-solid fa-arrow-left"></i>
@@ -220,40 +333,77 @@
 
 <script>
 
+//Toast notification function
+function showToast(type, title, message) {
+  const toastContainer = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  const toastTitle = document.createElement("div");
+  toastTitle.className = "toast-title";
+  toastTitle.textContent = title;
+  const toastMessage = document.createElement("div");
+  toastMessage.className = "toast-message";
+  toastMessage.textContent = message;
+  const closeButton = document.createElement("button");
+  closeButton.className = "toast-close";
+  closeButton.textContent = "×";
+  closeButton.onclick = () => {
+    toast.style.animation = "none";
+    toast.remove();
+  };
+  toast.appendChild(toastTitle);
+  toast.appendChild(toastMessage);
+  toast.appendChild(closeButton);
+  toastContainer.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.remove();
+    }
+  }, 2000);
+}
+
+
 // Helper to render info or fallback
 function show(val) {
   return val ? val : "Not Available";
 }
 
 function userCard(user) {
-  return `
-    <div class="user-card">
-      <div class="user-avatar">
-        <i class="fas fa-user-circle"></i>
-      </div>
-      <div class="user-info">
-        <div class="user-row">
-          <span class="user-name">${user.name}</span>
-          <span class="user-dept">${user.department}</span>
-        </div>
-        <div class="user-contact">
-          <div class="contact-row">
-            <i class="fas fa-envelope"></i>
-            ${show(user.email)}
-          </div>
-          <div class="contact-row">
-            <i class="fas fa-phone"></i>
-            ${show(user.mobileNumber)}
-          </div>
-          <div class="contact-row">
-            <i class="fas fa-id-badge"></i>
-            ${show(user.reportingto)}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
+	  return `
+	    <div class="user-card" style="position: relative;">
+	      <button class="delete-btn" title="Delete User" onclick="deleteUser('${user.email}')">
+	        <i class="fas fa-trash-alt"></i>
+	      </button>
+
+	      <div class="user-avatar">
+	        <i class="fas fa-user-circle"></i>
+	      </div>
+	     
+	      <div class="user-info">
+	        <div class="user-row">
+	          <span class="user-name">${user.name}</span>
+	          <span class="user-dept">${user.department}</span>
+	        </div>
+	        <div class="user-contact">
+	          <div class="contact-row">
+	            <i class="fas fa-envelope"></i>
+	            ${show(user.email)}
+	          </div>
+	          <div class="contact-row">
+	            <i class="fas fa-phone"></i>
+	            ${show(user.mobileNumber)}
+	          </div>
+	          <div class="contact-row">
+	            <i class="fas fa-id-badge"></i>
+	            ${show(user.reportingto)}
+	          </div>
+	        </div>
+	      </div>     
+	    </div>   
+	  `;
+	}
+
+
 
 // Fetch users from backend
 document.addEventListener("DOMContentLoaded", function () {
@@ -271,8 +421,50 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error fetching user data:", error);
     });
 });
+
+
+
+ function deleteUser(email) {
+	  Swal.fire({
+	    title: `Are you sure you want to delete ${email}?`,
+	    icon: 'warning',
+	    showCancelButton: true,
+	    confirmButtonColor: '#d33',
+	    cancelButtonColor: '#3085d6',
+	    confirmButtonText: 'Yes, delete it!',
+	    customClass: {
+	      popup: 'small-popup',
+	      title: 'small-title',
+	      confirmButton: 'small-btn',
+	      cancelButton: 'small-btn',
+	      icon: 'smaller-icon'
+	    }
+	  }).then((result) => {
+	    if (result.isConfirmed) {
+	      //  Show toast immediately on confirm
+	      showToast("info", "⏳ Deleting...", "Please wait while we delete the employee.");
+
+	      //  Proceed with API call
+	      fetch(`/api/manager/deleteUser/${encodeURIComponent(email)}`, {
+	        method: "DELETE"
+	      })
+	      .then(response => {
+	        if (!response.ok) throw new Error("Failed to delete user");
+	        return response.json();
+	      })
+	      .then(data => {
+	        // Optional: second confirmation toast
+	        showToast("success", "✅ Deleted!", "Employee Deleted Successfully");
+	        setTimeout(() => location.reload(), 1500); // Allow toast to show before reload
+	      })
+	      .catch(err => {
+	        showToast("error", "❌ Failed", "Failed To Delete Employee");
+	      });
+	    }
+	  });
+	}
+
 </script>
-
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
