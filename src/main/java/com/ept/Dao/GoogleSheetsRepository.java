@@ -20,14 +20,11 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 @Repository
 public class GoogleSheetsRepository {
 		
-	 private final GoogleSheetProperties sheetProperties;
-	 
-	 
+	 private final GoogleSheetProperties sheetProperties;	 
+	
 	 public GoogleSheetsRepository(GoogleSheetProperties sheetProperties) {
 	        this.sheetProperties = sheetProperties;			
-	    }
-	 
-	
+	    }	
 
 	 /*---------- User SignUp-----------------*/
 	    public boolean saveUser(User user) {
@@ -76,9 +73,7 @@ public class GoogleSheetsRepository {
 	    	return true;
 	    	
     }
-	    
-	
-	
+	    	
 	    /*---------- Getting All Users for Login Purpose-----------------*/
 	    
 	    public List<User> getAllUsers() {
@@ -124,7 +119,6 @@ public class GoogleSheetsRepository {
 	        }
 	    }
 
-
 	    /*---------- Assigning Task(Used In Manager)-----------------*/
 	    
 		public boolean saveTask(Task task) {
@@ -143,7 +137,6 @@ public class GoogleSheetsRepository {
 	                    : existingRows.size(); // Assume header is at index 0
 
 	            task.setId((long) nextId);
-
 	            
 	            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -163,8 +156,6 @@ public class GoogleSheetsRepository {
 		    rowData.add(task.getCompletion_date() != null ? task.getCompletion_date().format(formatter) : "");
 	            rowData.add(task.getRemarks() != null ? task.getRemarks() : "");
 
-
-
 	            List<List<Object>> rows = new ArrayList<>();
 	            rows.add(rowData);
 
@@ -180,8 +171,7 @@ public class GoogleSheetsRepository {
 	            e.printStackTrace();
 	        }
 	    	
-	    	return true;
-	    	
+	    	return true;	    	
 	    }
 
 		/*---------- Getting All Tasks(Used In Manager)-----------------*/
@@ -301,7 +291,6 @@ public class GoogleSheetsRepository {
 
 		    return Optional.empty();
 		}
-
 		
 		/*---------- Update Task Using Id-----------------*/
 
@@ -361,7 +350,6 @@ public class GoogleSheetsRepository {
 
 		    return false;
 		}
-
 		
 		/*---------- List of Tasks using Email(Used In Employee)-----------------*/
 		
@@ -458,16 +446,13 @@ public class GoogleSheetsRepository {
 		        return null;
 		    }
 
-		    
-
 		    private Object getObjectSafe(List<Object> row, int index) {
 		        if (row.size() > index) {
 		            return row.get(index);
 		        }
 		        return null;
 		    }
-		    
-		   
+		    		   
 		    /*---------------To Get All Employees----------------*/
 		    
 		   public List<Employees> allEmployees() {
@@ -575,8 +560,7 @@ public class GoogleSheetsRepository {
 		            return false;
 		        }
 		    }
-		
-		    
+				    
 		    /*---------------To Delete Task By Manager----------------*/
 		    
                public String deleteById(Long id) {
@@ -585,7 +569,7 @@ public class GoogleSheetsRepository {
 		            String spreadsheetId = sheetProperties.getTasksid();
 		            String sheetName = "Tasks.Resustainability";
 
-		            // Step 1: Fetch existing rows (excluding header)
+		            //  Fetch existing rows (excluding header)
 		            ValueRange response = sheetsService.spreadsheets().values()
 		                    .get(spreadsheetId, sheetName + "!A2:Z")
 		                    .execute();
@@ -596,7 +580,7 @@ public class GoogleSheetsRepository {
 		                return "No tasks found.";
 		            }
 
-		            // Step 2: Identify and remove the row with matching task ID
+		            //  Identify and remove the row with matching task ID
 		            boolean deleted = false;
 		            for (int i = 0; i < rows.size(); i++) {
 		                List<Object> row = rows.get(i);
@@ -617,19 +601,19 @@ public class GoogleSheetsRepository {
 		                return "Task with ID " + id + " not found.";
 		            }
 
-		            // Step 3: Reassign IDs (column A) starting from 1
+		            //  Reassign IDs (column A) starting from 1
 		            for (int i = 0; i < rows.size(); i++) {
 		                if (!rows.get(i).isEmpty()) {
 		                    rows.get(i).set(0, String.valueOf(i + 1)); // ID in column A
 		                }
 		            }
 
-		            // Step 4: Clear existing data (excluding header row)
+		            //  Clear existing data (excluding header row)
 		            sheetsService.spreadsheets().values()
 		                    .clear(spreadsheetId, sheetName + "!A2:Z", new ClearValuesRequest())
 		                    .execute();
 
-		            // Step 5: Write back the updated rows with reassigned IDs
+		            //  Write back the updated rows with reassigned IDs
 		            ValueRange updatedBody = new ValueRange().setValues(rows);
 		            sheetsService.spreadsheets().values()
 		                    .update(spreadsheetId, sheetName + "!A2", updatedBody)
@@ -642,8 +626,7 @@ public class GoogleSheetsRepository {
 		            return "Error while deleting task: " + e.getMessage();
 		        }
 		    }
-               
-               
+                             
                /*---------------To Update Profile----------------*/
                
                public Optional<User> updateUserByEmail(String email, User updatedUser) {
@@ -714,8 +697,7 @@ public class GoogleSheetsRepository {
    		            e.printStackTrace();
    		            return Optional.empty();
    		        }
-   		    }
-   		 
+   		    }  		 
                
                /*---------------To Delete Employee Permanently By Manager----------------*/
                
@@ -808,9 +790,6 @@ public class GoogleSheetsRepository {
     		    }
     		}
 
-    		
-
-
 	
 		/*---------- Utility Methods-----------------*/
 		
@@ -836,7 +815,5 @@ public class GoogleSheetsRepository {
 		        System.err.println("Date parse error at column " + index + ": " + e.getMessage());
 		    }
 		    return null;
-		}
-		
-
+		}		
 }
