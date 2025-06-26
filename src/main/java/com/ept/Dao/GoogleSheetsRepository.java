@@ -417,6 +417,8 @@ public class GoogleSheetsRepository {
 		    return employeeTasks;
 		}
 		
+		 /*---------------Employee Using Email----------------*/
+		
 		 public User userByemail(String email) {
 		        try {
 		            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsFirst());
@@ -437,14 +439,14 @@ public class GoogleSheetsRepository {
 
 		                if (rowEmail != null && rowEmail.equalsIgnoreCase(email)) {
 		                    User user = new User();
-		                    user.setId(getLongSafe(row, 0));               // ID
-		                    user.setName(getStringSafe(row, 1));           // Name
-		                    user.setEmail(rowEmail);                       // Email
-		                    user.setMobileNumber(getObjectSafe(row, 3));   // MobileNumber
-		                    user.setRole(getStringSafe(row, 4));           // Role
-		                    user.setDepartment(getStringSafe(row, 5));        // Department
-		                    user.setStatus(getStringSafe(row, 6));         // Status
-		                    user.setPassword(getStringSafe(row, 7)); // password is at index 7
+		                    user.setId(getLongSafe(row, 0));              
+		                    user.setName(getStringSafe(row, 1));           
+		                    user.setEmail(rowEmail);                       
+		                    user.setMobileNumber(getObjectSafe(row, 3));   
+		                    user.setRole(getStringSafe(row, 4));           
+		                    user.setDepartment(getStringSafe(row, 5));      
+		                    user.setStatus(getStringSafe(row, 6));         
+		                    user.setPassword(getStringSafe(row, 7)); 
 		                    user.setReportingto(getStringSafe(row, 8));
 		                    return user;
 		                }
@@ -465,6 +467,8 @@ public class GoogleSheetsRepository {
 		        return null;
 		    }
 		    
+		   
+		    /*---------------To Get All Employees----------------*/
 		    
 		   public List<Employees> allEmployees() {
 		        int retries = 3;
@@ -514,8 +518,10 @@ public class GoogleSheetsRepository {
 		        }
 		        return Collections.emptyList();
 		    }
+		   
 
-		    
+		   /*---------------To Reset/Update Password----------------*/
+		   
 		    public boolean updateUserPassword(String email, String newPassword) {
 		        try {
 		            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsFirst());
@@ -570,7 +576,10 @@ public class GoogleSheetsRepository {
 		        }
 		    }
 		
-                     public String deleteById(Long id) {
+		    
+		    /*---------------To Delete Task By Manager----------------*/
+		    
+               public String deleteById(Long id) {
 		        try {
 		            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsSecond());
 		            String spreadsheetId = sheetProperties.getTasksid();
@@ -633,6 +642,175 @@ public class GoogleSheetsRepository {
 		            return "Error while deleting task: " + e.getMessage();
 		        }
 		    }
+               
+               
+               /*---------------To Update Profile----------------*/
+               
+               public Optional<User> updateUserByEmail(String email, User updatedUser) {
+   		        try {
+   		            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsFirst());
+
+   		            ValueRange response = sheetsService.spreadsheets().values()
+   		                    .get(sheetProperties.getUserid(), "Users.Resustainability!A2:I")
+   		                    .execute();
+
+   		            List<List<Object>> values = response.getValues();
+   		            if (values == null || values.isEmpty()) {
+   		                return Optional.empty();
+   		            }
+
+   		            int rowIndex = -1;
+   		            List<Object> rowToUpdate = null;
+
+   		            for (int i = 0; i < values.size(); i++) {
+   		                List<Object> row = values.get(i);
+   		                if (row.size() > 2 && row.get(2).toString().equalsIgnoreCase(email)) {
+   		                    rowIndex = i + 2; // Adjust for header and 0-based index
+   		                    rowToUpdate = row;
+   		                    break;
+   		                }
+   		            }
+
+   		            if (rowIndex == -1 || rowToUpdate == null) {
+   		                return Optional.empty();
+   		            }
+
+   		            // Preserve old values or override with new ones
+   		            String id = rowToUpdate.size() > 0 ? rowToUpdate.get(0).toString() : "";
+   		            String name = updatedUser.getName() != null ? updatedUser.getName() : (rowToUpdate.size() > 1 ? rowToUpdate.get(1).toString() : "");
+   		            String emailFinal = email;
+   		            String mobile = updatedUser.getMobileNumber() != null ? updatedUser.getMobileNumber().toString() : (rowToUpdate.size() > 3 ? rowToUpdate.get(3).toString() : "");
+   		            String role = updatedUser.getRole() != null ? updatedUser.getRole() : (rowToUpdate.size() > 4 ? rowToUpdate.get(4).toString() : "");
+   		            String department = updatedUser.getDepartment() != null ? updatedUser.getDepartment() : (rowToUpdate.size() > 5 ? rowToUpdate.get(5).toString() : "");
+   		            String status = rowToUpdate.size() > 6 ? rowToUpdate.get(6).toString() : "";
+   		            String password = rowToUpdate.size() > 7 ? rowToUpdate.get(7).toString() : "";
+   		            String reportingTo = rowToUpdate.size() > 8 ? rowToUpdate.get(8).toString() : "";
+
+   		            List<Object> newRow = List.of(
+   		                    id, name, emailFinal, mobile, role, department, status, password, reportingTo
+   		            );
+
+   		            ValueRange body = new ValueRange().setValues(List.of(newRow));
+   		            sheetsService.spreadsheets().values()
+   		                    .update(sheetProperties.getUserid(), "Users.Resustainability!A" + rowIndex + ":I" + rowIndex, body)
+   		                    .setValueInputOption("RAW")
+   		                    .execute();
+
+   		            // Return updated user
+   		            User user = new User();
+   		            user.setId(Long.parseLong(id));
+   		            user.setName(name);
+   		            user.setEmail(emailFinal);
+   		            user.setMobileNumber(mobile); // stored as Object
+   		            user.setRole(role);
+   		            user.setDepartment(department);
+   		            user.setStatus(status);
+   		            user.setPassword(password);
+   		            user.setReportingto(reportingTo);
+
+   		            return Optional.of(user);
+
+   		        } catch (Exception e) {
+   		            e.printStackTrace();
+   		            return Optional.empty();
+   		        }
+   		    }
+   		 
+               
+               /*---------------To Delete Employee Permanently By Manager----------------*/
+               
+      		 public String deleteEmployeeFromBothSheets(String email) {
+      			    StringBuilder result = new StringBuilder();
+
+      			    try {
+      			        // USERS sheet - email in column C => index 2
+      			        Sheets sheetsUsers = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsFirst());
+      			        String usersSheetId = sheetProperties.getUserid();
+      			        result.append(
+      			            deleteFromSheetByEmailAndReassignSerials(
+      			                sheetsUsers, usersSheetId, "Users.Resustainability", email, 2
+      			            )
+      			        ).append("\n");
+
+      			        // EMPLOYEES sheet - email in column B => index 1
+      			        Sheets sheetsEmployees = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsThird());
+      			        String employeesSheetId = sheetProperties.getEmpid();
+      			        result.append(
+      			            deleteFromSheetByEmailAndReassignSerials(
+      			                sheetsEmployees, employeesSheetId, "Employees.Resustainability", email, 1
+      			            )
+      			        );
+
+      			        return result.toString().trim();
+
+      			    } catch (Exception e) {
+      			        e.printStackTrace();
+      			        return "Error deleting employee: " + e.getMessage();
+      			    }
+      			}
+      		 
+      		 
+      		
+      		 /*---------------Support Method To Delete Employee Permanently By Manager----------------*/
+      		 
+      		private String deleteFromSheetByEmailAndReassignSerials(
+    		        Sheets sheetsService,
+    		        String spreadsheetId,
+    		        String sheetName,
+    		        String email,
+    		        int emailColumnIndex
+    		) {
+    		    try {
+    		        ValueRange response = sheetsService.spreadsheets().values()
+    		                .get(spreadsheetId, sheetName + "!A2:Z")
+    		                .execute();
+
+    		        List<List<Object>> rows = response.getValues();
+    		        if (rows == null || rows.isEmpty()) {
+    		            return "No data found in " + sheetName;
+    		        }
+
+    		        boolean deleted = false;
+    		        for (int i = 0; i < rows.size(); i++) {
+    		            List<Object> row = rows.get(i);
+    		            if (row.size() > emailColumnIndex && email.equalsIgnoreCase(row.get(emailColumnIndex).toString())) {
+    		                rows.remove(i);
+    		                deleted = true;
+    		                break;
+    		            }
+    		        }
+
+    		        if (!deleted) {
+    		            return "No user with email " + email + " found in " + sheetName;
+    		        }
+
+    		        for (int i = 0; i < rows.size(); i++) {
+    		            if (!rows.get(i).isEmpty()) {
+    		                rows.get(i).set(0, String.valueOf(i + 1)); // Reset serial number
+    		            }
+    		        }
+
+    		        sheetsService.spreadsheets().values()
+    		                .clear(spreadsheetId, sheetName + "!A2:Z", new ClearValuesRequest())
+    		                .execute();
+
+    		        ValueRange updatedBody = new ValueRange().setValues(rows);
+    		        sheetsService.spreadsheets().values()
+    		                .update(spreadsheetId, sheetName + "!A2", updatedBody)
+    		                .setValueInputOption("RAW")
+    		                .execute();
+
+    		        return "Deleted from " + sheetName;
+
+    		    } catch (Exception e) {
+    		        e.printStackTrace();
+    		        return "Error deleting from " + sheetName + ": " + e.getMessage();
+    		    }
+    		}
+
+    		
+
+
 	
 		/*---------- Utility Methods-----------------*/
 		
@@ -660,9 +838,5 @@ public class GoogleSheetsRepository {
 		    return null;
 		}
 		
-		
-		
-}	
 
-
-
+}
