@@ -222,11 +222,81 @@
         margin-top: 8px;
       }
     }
+    
+       .toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999; /* Make sure it's higher than your popup */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+
+    .toast {
+      position: relative;
+      min-width: 250px;
+      max-width: 350px;
+      background-color: white;
+      color: #333;
+      padding: 12px 40px 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      animation: fadeInOut 5s forwards;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      border-left: 4px solid transparent;
+    }
+
+    .toast.success {
+      border-left-color: #4caf50;
+    }
+
+    .toast.error {
+      border-left-color: #f44336;
+    }
+
+    .toast.info {
+      border-left-color: #2196f3;
+    }
+
+    .toast-title {
+      font-weight: bold;
+      margin-bottom: 2px;
+      color: #333;
+    }
+
+    .toast-message {
+      color: #666;
+    }
+
+    .toast-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
   </style>
   </head>
 <body>
-
 <header>
+<div id="toast-container" class="toast-container"></div>
   <a id="backLink" href="#" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
     <i class="fa-solid fa-arrow-left"></i>
   </a>
@@ -264,6 +334,7 @@
     <p>-</p>
   </div>
 </div>
+
  <div id="editPopup" class="popup-overlay" style="display: none;">
 <div class="popup-form">
   <!-- Cancel button as top right X -->
@@ -302,6 +373,35 @@
 </div>
 
 <script>
+
+//Toast notification function
+function showToast(type, title, message) {
+  const toastContainer = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  const toastTitle = document.createElement("div");
+  toastTitle.className = "toast-title";
+  toastTitle.textContent = title;
+  const toastMessage = document.createElement("div");
+  toastMessage.className = "toast-message";
+  toastMessage.textContent = message;
+  const closeButton = document.createElement("button");
+  closeButton.className = "toast-close";
+  closeButton.textContent = "×";
+  closeButton.onclick = () => {
+    toast.style.animation = "none";
+    toast.remove();
+  };
+  toast.appendChild(toastTitle);
+  toast.appendChild(toastMessage);
+  toast.appendChild(closeButton);
+  toastContainer.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.remove();
+    }
+  }, 2000);
+}
   
    document.addEventListener("DOMContentLoaded", function () {
     const email = localStorage.getItem("EmpEmail");
@@ -350,7 +450,9 @@
         document.getElementById("backLink").href = backHref;
 
         let homeLink = localStorage.getItem("EmpRole") === "manager" ? "managerDashboard.html" : "employeeDashboard.html";
-        let graphLink = localStorage.getItem("EmpRole") === "manager" ? "managerPerform.html" : "performanceDashboard.html";       
+        let graphLink = localStorage.getItem("EmpRole") === "manager" ? "managerPerform.html" : "performanceDashboard.html";
+
+       
       })
       .catch(error => {
         console.error("Error loading user:", error);
@@ -373,40 +475,50 @@
   function closeEditPopup() {
     document.getElementById("editPopup").style.display = "none";
   }
-
+  
   document.getElementById("editForm").addEventListener("submit", function (e) {
-    e.preventDefault();
+	  e.preventDefault();
 
-    const updatedUser = {
-      id: currentUser.id,
-      name: document.getElementById("editName").value,
-      email: currentUser.email,
-      mobileNumber: document.getElementById("editMobile").value,
-      department: document.getElementById("editDepartment").value,
-      role: document.getElementById("editRole").value,
-      status: currentUser.status,
-      password: currentUser.password,
-      reportingto: document.getElementById("editReportingTo").value
-    };
+	  const updateBtn = this.querySelector("button[type='submit']");
+	  const originalBtnText = updateBtn.textContent;
+	  updateBtn.disabled = true;
+	  updateBtn.textContent = "Updating...";
 
-    fetch(`/api/users/update-by-email/${encodeURIComponent(currentUser.email)}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedUser)
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to update");
-        return res.json();
-      })
-      .then(data => {
-        alert("Profile updated successfully!");
-        location.reload();
-      })
-      .catch(err => {
-        console.error("Update failed:", err);
-        alert("Failed to update profile.");
-      });
-  });
+	  const updatedUser = {
+	    id: currentUser.id,
+	    name: document.getElementById("editName").value,
+	    email: currentUser.email,
+	    mobileNumber: document.getElementById("editMobile").value,
+	    department: document.getElementById("editDepartment").value,
+	    role: document.getElementById("editRole").value,
+	    status: currentUser.status,
+	    password: currentUser.password,
+	    reportingto: document.getElementById("editReportingTo").value
+	  };
+
+	  fetch(`/api/users/update-by-email/${encodeURIComponent(currentUser.email)}`, {
+	    method: "PUT",
+	    headers: { "Content-Type": "application/json" },
+	    body: JSON.stringify(updatedUser)
+	  })
+	    .then(res => {
+	      if (!res.ok) throw new Error("Failed to update");
+	      return res.json();
+	    })
+	    .then(data => {
+	      showToast("success", "✅ Updated", "Profile updated successfully!");
+	      closeEditPopup();
+	      setTimeout(() => location.reload(), 1500);
+	    })
+	    .catch(err => {
+	      console.error("Update failed:", err);
+	      showToast("error", "❌ Error", "Failed to update profile.");
+	    })
+	    .finally(() => {
+	      updateBtn.disabled = false;
+	      updateBtn.textContent = originalBtnText;
+	    });
+	});
 </script>
 </body>
 </html>
