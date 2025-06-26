@@ -62,6 +62,9 @@ public class ManagerController {
 	    String message = taskService.delEmpByMail(email); 
 	    return ResponseEntity.ok(message); 
 	}
-	
+	@PostMapping("/addEmployee")
+	    public String addEmployee(@RequestBody Employees employee) {
+	        return taskService.addEmp(employee);
+	    }
 	
 }
