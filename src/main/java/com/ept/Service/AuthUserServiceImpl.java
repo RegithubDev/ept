@@ -8,12 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.ept.Dao.GoogleSheetsRepository;
 import com.ept.Entity.Employees;
 import com.ept.Entity.LoginResponse;
 import com.ept.Entity.User;
-
 
 @Service
 public class AuthUserServiceImpl implements AuthUserService {
@@ -111,6 +109,16 @@ public class AuthUserServiceImpl implements AuthUserService {
         // Hash the new password before updating
         String hashedPassword = passwordEncoder.encode(newPassword);
         return googleSheetsRepository.updateUserPassword(email, hashedPassword);
+    }
+
+    @Override
+    public User updateUserByEmail(String email, User updatedUser) {
+        // First fetch existing user
+        User existingUser = getUserByEmail(email);
+        if (existingUser == null) {
+            return null; // User not found
+        }
+        return googleSheetsRepository.updateUserByEmail(email, updatedUser).orElse(null);
     }
 }
 
