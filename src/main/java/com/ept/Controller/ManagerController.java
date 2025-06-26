@@ -1,17 +1,17 @@
 package com.ept.Controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.ept.Entity.Employees;
 import com.ept.Entity.Task;
 import com.ept.Entity.User;
 import com.ept.Service.ManagerService;
@@ -56,6 +56,11 @@ public class ManagerController {
 	@DeleteMapping("/delete/{id}")
 	public String deleteTaskById(@PathVariable Long id) {
 	    return taskService.delById(id);
+	}
+	@DeleteMapping("/deleteUser/{email}")
+	public ResponseEntity<String> deleteEmployee(@PathVariable String email) {
+	    String message = taskService.delEmpByMail(email); 
+	    return ResponseEntity.ok(message); 
 	}
 	
 	
