@@ -19,4 +19,6 @@ public interface ManagerService {
 	String delById(Long id);
 
 	String delEmpByMail(String email);
+
+	String addEmp(Employees employee);
 }
