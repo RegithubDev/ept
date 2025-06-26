@@ -29,145 +29,281 @@
       color: #1e40af;
     }
 
-    .container {
-      flex: 1;
-      padding: 20px;
-    }
-
     .profile-card {
       background: #fff;
       padding: 20px;
       border-radius: 10px;
-      width: 393px;
+      width: 437px;
       margin: auto;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-      font-size: smaller;
+      font-size: medium;
     }
 
-    .profile-header {
-      text-align: center;
-      margin-bottom: 20px;
+ .profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.profile-title-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-icon {
+  font-size: 60px;
+  color: #5ea320;
+  margin-bottom: 0.5rem;
+}
+
+.name-edit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.name-edit h3 {
+  margin: 8px;
+  margin-left:46px;
+}
+
+    .profile-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .profile-header i {
+    .profile-title i {
       font-size: 50px;
       color: #5ea320;
-      margin-bottom: 10px;
     }
 
     .profile-details label {
       font-weight: bold;
       display: block;
       margin-top: 10px;
+      margin-left:21px;
     }
 
     .profile-details p {
-      margin: 5px 0 15px;
+      margin: 5px 44px 16px;
       color: #333;
     }
 
-    .profile-details i{
-    color: #da0d14;
-    margin-right: 6px;
-}
+    .profile-details i {
+      color: #da0d14;
+      margin-right: 6px;
+    }
 
-    .bottom-nav {
+    .edit-icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .edit-icon-btn:hover {
+      color: #000;
+    }
+
+    .edit-icon-btn i {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .popup-overlay {
       position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: #fff;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
       display: flex;
-      justify-content: space-around;
-      border-top: 1px solid #ccc;
-      padding: 10px 0;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
     }
 
-    .bottom-nav a {
-      text-align: center;
-      color: #333;
-      text-decoration: none;
-      font-size: 12px;
+    .popup-form {
+      max-width: 500px;
+      background-color: white;
+      padding: 3rem;
+      border-radius: 10px;
+      font-family: Arial, sans-serif;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative;
     }
 
-    .bottom-nav i {
-      font-size: 20px;
-      display: block;
-      margin-bottom: 4px;
+    .popup-form h3 {
+      margin-top: -16px;
+      text-align: left;
+      margin-bottom: 29px;
+      color: blue;
     }
 
-    .bottom-nav a:hover {
-      color: #007bff;
-      transform: scale(1.1);
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem 2rem;
+      margin-bottom: -1rem;
+      margin-right: 17px;
     }
-    
-   @media screen and (max-width: 480px) {
-  .profile-card {
-    width: 90%;
-    padding: 16px;
-    font-size: 14px;
-  }
 
-  .profile-header i {
-    font-size: 40px;
-  }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
 
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.8rem 1rem;
-  }
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
 
-  header h2 {
-    font-size: 1rem;
-    margin-top: 8px;
-  }
+    .form-group input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
 
-  .bottom-nav a {
-    font-size: 11px;
-  }
+    .form-actions {
+      display: flex;
+      justify-content: center;
+    }
 
-  .bottom-nav i {
-    font-size: 16px;
-  }
-} 
-    
+    .form-actions button {
+      padding: 0.6rem 1.5rem;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 1rem;
+      background-color: #6b6adfc7;
+      color: white;
+      cursor: pointer;
+      margin-top:41px;
+    }
+
+    .form-actions button:active {
+      background-color: #3a3ab5;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    @media screen and (max-width: 480px) {
+      .profile-card {
+        width: 90%;
+        padding: 16px;
+        font-size: 14px;
+      }
+
+      .profile-title i {
+        font-size: 40px;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.8rem 1rem;
+      }
+
+      header h2 {
+        font-size: 1rem;
+        margin-top: 8px;
+      }
+    }
   </style>
-</head>
+  </head>
 <body>
 
 <header>
   <a id="backLink" href="#" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
     <i class="fa-solid fa-arrow-left"></i>
   </a>
-  <h2><i class="fa-solid fa-user-circle"></i> User Profile</h2>
+  <h2><i class="fa-solid fa-user-circle"></i> My Profile</h2>
 </header>
 
-<div class="container">
-  <div class="profile-card">
-    <div class="profile-header">
-      <i class="fa-solid fa-user-circle"></i>
-      <h3>Loading...</h3>
+<!-- <div class="container"> -->
+<div class="profile-card">
+  <div class="profile-header">
+  <div class="profile-title-centered">
+    <i class="fa-solid fa-user-circle profile-icon"></i>
+    <div class="name-edit">
+      <h3 id="profileName">Loading...</h3>
+      <button class="edit-icon-btn" onclick="openEditPopup()" title="Edit Profile">
+        <i class="fa fa-pencil-alt"></i>
+      </button>
     </div>
-
-    <div class="profile-details">
-      <label><i class="fa-solid fa-envelope"></i> Email:</label>
-      <p>-</p>
-
-      <label><i class="fa-solid fa-user-tie"></i> Position:</label>
-      <p>-</p>
-
-      <label><i class="fa-solid fa-building"></i> Department:</label>
-      <p>-</p>
-
-      <label><i class="fa-solid fa-phone"></i> Phone:</label>
-      <p>-</p>
   </div>
 </div>
 
- 
+  <div class="profile-details">
+    <label><i class="fa-solid fa-envelope"></i> Email:</label>
+    <p>-</p>
+
+    <label><i class="fa-solid fa-user-tie"></i> Position:</label>
+    <p>-</p>
+
+    <label><i class="fa-solid fa-building"></i> Department:</label>
+    <p>-</p>
+
+    <label><i class="fa-solid fa-phone"></i> Phone:</label>
+    <p>-</p>
+
+    <label><i class="fa-solid fa-user-tie"></i> Reporting To:</label>
+    <p>-</p>
+  </div>
+</div>
+ <div id="editPopup" class="popup-overlay" style="display: none;">
+<div class="popup-form">
+  <!-- Cancel button as top right X -->
+  <button class="close-button" onclick="closeEditPopup()">×</button>
+
+  <h3>Edit Profile</h3>
+  <form id="editForm">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Name:</label>
+        <input type="text" id="editName" required />
+      </div>
+      <div class="form-group">
+        <label>Phone:</label>
+        <input type="text" id="editMobile" required />
+      </div>
+      <div class="form-group">
+        <label>Department:</label>
+        <input type="text" id="editDepartment" required />
+      </div>
+      <div class="form-group">
+        <label>Role:</label>
+        <input type="text" id="editRole" required />
+      </div>
+      <div class="form-group">
+        <label>Reporting To:</label>
+        <input type="text" id="editReportingTo" required />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit">Update profile</button>
+    </div>
+  </form>
+</div>
+</div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  
+   document.addEventListener("DOMContentLoaded", function () {
     const email = localStorage.getItem("EmpEmail");
 
     if (!email) {
@@ -180,8 +316,13 @@
         if (!response.ok) throw new Error("User not found");
         return response.json();
       })
+      
       .then(user => {
-        document.querySelector(".profile-header h3").textContent = user.email || "User";
+    	  currentUser = user; // ✅ set globally for edit popup 
+    	  
+        /* document.querySelector(".profile-header h3").textContent = user.name || "User"; */
+        document.getElementById("profileName").textContent = user.name || "User";
+
 
         document.querySelector(".profile-details").innerHTML = `
           <label><i class="fa-solid fa-envelope"></i> Email:</label>
@@ -195,6 +336,9 @@
 
           <label><i class="fa-solid fa-phone"></i> Phone:</label>
           <p>${user.mobileNumber || "-"}</p>
+          
+          <label><i class="fa-solid fa-user-tie"></i> Reporting To:</label>
+          <p>${user.reportingto || "-"}</p>
         `;
 
         const role = user.role?.toLowerCase() || "employee";
@@ -206,16 +350,63 @@
         document.getElementById("backLink").href = backHref;
 
         let homeLink = localStorage.getItem("EmpRole") === "manager" ? "managerDashboard.html" : "employeeDashboard.html";
-        let graphLink = localStorage.getItem("EmpRole") === "manager" ? "managerPerform.html" : "performanceDashboard.html";
-
-       
+        let graphLink = localStorage.getItem("EmpRole") === "manager" ? "managerPerform.html" : "performanceDashboard.html";       
       })
       .catch(error => {
         console.error("Error loading user:", error);
       });
   });
-  
-</script>
+   
+  let currentUser = null;
 
+  function openEditPopup() {
+    if (!currentUser) return;
+
+    document.getElementById("editName").value = currentUser.name || "";
+    document.getElementById("editMobile").value = currentUser.mobileNumber || "";
+    document.getElementById("editDepartment").value = currentUser.department || "";
+    document.getElementById("editRole").value = currentUser.role || "";
+    document.getElementById("editReportingTo").value = currentUser.reportingto || "";
+    document.getElementById("editPopup").style.display = "flex";
+  }
+
+  function closeEditPopup() {
+    document.getElementById("editPopup").style.display = "none";
+  }
+
+  document.getElementById("editForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const updatedUser = {
+      id: currentUser.id,
+      name: document.getElementById("editName").value,
+      email: currentUser.email,
+      mobileNumber: document.getElementById("editMobile").value,
+      department: document.getElementById("editDepartment").value,
+      role: document.getElementById("editRole").value,
+      status: currentUser.status,
+      password: currentUser.password,
+      reportingto: document.getElementById("editReportingTo").value
+    };
+
+    fetch(`/api/users/update-by-email/${encodeURIComponent(currentUser.email)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedUser)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to update");
+        return res.json();
+      })
+      .then(data => {
+        alert("Profile updated successfully!");
+        location.reload();
+      })
+      .catch(err => {
+        console.error("Update failed:", err);
+        alert("Failed to update profile.");
+      });
+  });
+</script>
 </body>
 </html>
