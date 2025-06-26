@@ -118,5 +118,19 @@ public class ManagerServiceImpl implements ManagerService {
 	 	        return "❌ Failed to delete Employee:\n" + result;
 	 	    }
 	 	}
+
+	     @Override
+	     public String addEmp(Employees employee) {
+	         try {
+	             Employees saved = googleSheetsRepository.saveEmployee(employee);
+	             if (saved != null) {
+	                 return "Employee saved successfully";
+	             } else {
+	                 return "Employee already exists";
+	             }
+	         } catch (Exception e) {
+	             return "Failed to add employee";
+	         }
+	     }
 	
 }
