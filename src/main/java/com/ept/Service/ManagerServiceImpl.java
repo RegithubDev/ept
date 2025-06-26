@@ -5,9 +5,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ept.Dao.GoogleSheetsRepository;
+import com.ept.Entity.Employees;
 import com.ept.Entity.Task;
 import com.ept.Entity.User;
-
 
 @Service
 public class ManagerServiceImpl implements ManagerService {
@@ -101,6 +101,22 @@ public class ManagerServiceImpl implements ManagerService {
 	 	        return "❌ Failed to delete task: " + result;
 	 	    }
 
+	 	}
+
+	        @Override
+	 	public String delEmpByMail(String email) {
+	 	    String result = googleSheetsRepository.deleteEmployeeFromBothSheets(email).toLowerCase();
+
+	 	    boolean deletedFromUsers = result.contains("deleted from users.resustainability");
+	 	    boolean deletedFromEmployees = result.contains("deleted from employees.resustainability");
+
+	 	    if (deletedFromUsers && deletedFromEmployees) {
+	 	        return "✅ Employee deleted successfully from both sheets.";
+	 	    } else if (deletedFromUsers || deletedFromEmployees) {
+	 	        return "⚠️ Partially deleted:\n" + result;
+	 	    } else {
+	 	        return "❌ Failed to delete Employee:\n" + result;
+	 	    }
 	 	}
 	
 }
