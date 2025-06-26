@@ -790,7 +790,64 @@ public class GoogleSheetsRepository {
     		    }
     		}
 
-	
+	/*---------------To Add Employee By Manager Who can Register To Application----------------*/
+      		
+      		 public Employees saveEmployee(Employees employee) {
+      	        try {
+      	            Sheets sheetsService = GoogleSheetServiceUtil.getSheetsService(sheetProperties.getCredentialsThird());
+      	            String spreadsheetId = sheetProperties.getEmpid();
+      	            String sheetName = "Employees.Resustainability";
+
+      	            // Step 1: Read existing rows
+      	            ValueRange response = sheetsService.spreadsheets().values()
+      	                    .get(spreadsheetId, sheetName + "!A2:D")
+      	                    .execute();
+
+      	            List<List<Object>> rows = response.getValues();
+
+      	            // Step 2: Check for duplicate email in column B (index 1)
+      	            if (rows != null) {
+      	                for (List<Object> row : rows) {
+      	                    if (row.size() > 1 && employee.getEmail().equalsIgnoreCase(row.get(1).toString())) {
+      	                        return null; // duplicate found
+      	                    }
+      	                }
+      	            }
+
+      	            int newId = (rows == null) ? 1 : rows.size() + 1;
+
+      	            // Step 3: Prepare row to append
+      	          List<Object> newRow = new ArrayList<>();
+      	        newRow.add(String.valueOf(newId));
+      	        newRow.add(employee.getEmail());
+      	        newRow.add(capitalizeFirstLetter(employee.getRole()));
+      	        newRow.add(employee.getDepartment().toUpperCase());
+
+      	            List<List<Object>> data = new ArrayList<>();
+      	            data.add(newRow);
+
+      	            ValueRange body = new ValueRange().setValues(data);
+      	            sheetsService.spreadsheets().values()
+      	                .append(spreadsheetId, sheetName + "!A:D", body)
+      	                .setValueInputOption("RAW")
+      	                .execute();
+
+      	            employee.setId((long) newId);
+      	            return employee;
+
+      	        } catch (Exception e) {
+      	            e.printStackTrace();
+      	            return null;
+      	        }
+      	    }
+      	
+      		 
+      		private String capitalizeFirstLetter(String input) {
+      		    if (input == null || input.isEmpty()) return input;
+      		    return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+      		}
+
+
 		/*---------- Utility Methods-----------------*/
 		
 		private String getStringSafe(List<Object> row, int index) {
