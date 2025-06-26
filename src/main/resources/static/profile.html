@@ -39,6 +39,13 @@
       font-size: medium;
     }
 
+   /*  .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+ */
+ 
  .profile-header {
   display: flex;
   flex-direction: column;
@@ -295,8 +302,11 @@
   </style>
   </head>
 <body>
+
 <header>
+
 <div id="toast-container" class="toast-container"></div>
+
   <a id="backLink" href="#" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
     <i class="fa-solid fa-arrow-left"></i>
   </a>
@@ -305,6 +315,15 @@
 
 <!-- <div class="container"> -->
 <div class="profile-card">
+  <!-- <div class="profile-header">
+    <div class="profile-title">
+      <i class="fa-solid fa-user-circle"></i>
+      <h3>Loading...</h3>
+    </div>
+    <button class="edit-icon-btn" onclick="openEditPopup()" title="Edit Profile">
+      <i class="fa fa-pencil-alt"></i>
+    </button>
+  </div> -->
   <div class="profile-header">
   <div class="profile-title-centered">
     <i class="fa-solid fa-user-circle profile-icon"></i>
@@ -334,6 +353,7 @@
     <p>-</p>
   </div>
 </div>
+
 
  <div id="editPopup" class="popup-overlay" style="display: none;">
 <div class="popup-form">
@@ -459,6 +479,9 @@ function showToast(type, title, message) {
       });
   });
    
+   
+
+
   let currentUser = null;
 
   function openEditPopup() {
@@ -475,6 +498,7 @@ function showToast(type, title, message) {
   function closeEditPopup() {
     document.getElementById("editPopup").style.display = "none";
   }
+
   
   document.getElementById("editForm").addEventListener("submit", function (e) {
 	  e.preventDefault();
@@ -519,6 +543,8 @@ function showToast(type, title, message) {
 	      updateBtn.textContent = originalBtnText;
 	    });
 	});
+
+
 </script>
 </body>
 </html>
