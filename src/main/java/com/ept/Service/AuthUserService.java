@@ -9,12 +9,13 @@ import com.ept.Entity.LoginResponse;
 import com.ept.Entity.User;
 
 public interface AuthUserService {
-    String signup(User user);    
     
+    String signup(User user);        
     Optional<LoginResponse> login(String email, String role, String password); 
     User getUserByEmail(String email);
     List<Employees> getAllemployees();
     String requestOtp(String email);
     boolean verifyOtp(String email, String otp);
     boolean resetPassword(String email, String newPassword);
+    User updateUserByEmail(String email, User updatedUser);
 }
