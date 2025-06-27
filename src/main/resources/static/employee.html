@@ -764,13 +764,18 @@
         </div>
          <div class="form-group">
             <label for="department">Department:</label>
-            <select id="department" name="department" required>
+           <!-- <select id="department" name="department" required>
               <option value="">Select Department</option>
-           <!--   <option value="IT"> IT </option>
+              <option value="IT"> IT </option>
               <option value="SAP"> SAP </option>
-              <option value="FINANCE"> FINANCE </option>
-              <option value="HR"> HR </option> -->
-            </select> 
+              <option value="DIGITALTRANSFORMATION"> Digital Transformation </option>
+              <option value="AIML"> AI ML </option>
+            </select> -->
+            
+            <!-- <select id="department" name="department" required>
+            <option value="">Select Department</option>
+            </select> -->
+		 <input type="text" id="department" name="department" readonly >
           </div>
         <div class="form-group">
           <label for="area">Area:</label>
@@ -1062,7 +1067,7 @@ taskChart = new Chart(ctx, {
   }
 });
 
-	async function populateDepartmentsDropdown() {
+	/* async function populateDepartmentsDropdown() {
 	  const dropdown = document.getElementById("department");
 	  dropdown.innerHTML = '<option value="">Select Department</option>'; // Reset
 
@@ -1095,9 +1100,9 @@ taskChart = new Chart(ctx, {
 	// Call this when the page or form loads
 	document.addEventListener("DOMContentLoaded", populateDepartmentsDropdown);
 
-
+*/
 	
-function openTaskPopup() {
+/*function openTaskPopup() {
 	  // Show the popup
 	  document.getElementById('addTaskPopup').style.display = 'flex';
 
@@ -1114,7 +1119,37 @@ function openTaskPopup() {
 
 function closeTaskPopup() {
   document.getElementById('addTaskPopup').style.display = 'none';
-}
+} */
+
+	async function openTaskPopup() {
+		  const popup = document.getElementById('addTaskPopup');
+		  popup.style.display = 'flex';
+
+		  const empEmail = localStorage.getItem('EmpEmail');
+
+		  if (empEmail) {
+		    document.getElementById('person').value = empEmail;
+
+		    try {
+		      const response = await fetch(`/api/users/by-email/${encodeURIComponent(empEmail)}`);
+		      if (!response.ok) throw new Error('User not found');
+		      const user = await response.json();
+
+		      // Set department in readonly input
+		      const departmentInput = document.getElementById('department');
+		      departmentInput.value = user.department || '';
+
+		    } catch (err) {
+		      console.error('Failed to load user department:', err);
+		      showToast('error', '❌ Error', 'Unable to fetch department');
+		    }
+		  }
+		}
+
+	function closeTaskPopup() {
+		  document.getElementById('addTaskPopup').style.display = 'none';
+		}
+	
 
 async function submitTask(event) {
 	  event.preventDefault();
