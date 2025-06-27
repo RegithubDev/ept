@@ -861,14 +861,14 @@ fetchTasks();
 	    const result = await response.text();
 
 	    if (response.ok) {
-	      showToast('success', '✅ Task Deleted', result);
+	      showToast('success', '✅ Task Deleted', "Task Deleted Successfully");
 	      fetchTasks(); // refresh task list
 	    } else {
-	      showToast('error', '❌ Delete Failed', result || 'Failed to delete task');
+	      showToast('error', '❌ Delete Failed', "Failed To Delete Task");
 	    }
 	  } catch (err) {
 	    console.error('Delete error:', err);
-	    showToast('error', '❌ Delete Error', err.message || 'An error occurred');
+	    showToast('error', '❌ Delete Error', "An Error Occured While Deleting The Task");
 	  }
 	}
 
