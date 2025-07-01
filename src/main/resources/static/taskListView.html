@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,11 +23,11 @@
     button, select {
       padding: 0.5rem 1rem;
       border: none;
-      background: #e0e7ff;
+       background: #e0e7ff; 
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      border: 1px solid #ccc;
+       border: 1px solid #ccc; 
     }
     button.active, select.active {
       background: #1e40af;
@@ -101,12 +102,15 @@
     th, td {
       padding: 12px;
       text-align: left;
+      font-size: medium;   /*New*/
     }
     thead {
       background: #f0f0f0;
     }
     tr {
       border-top: 1px solid #ddd;
+      border-top: 1px solid #e0e7ff;  /*New*/
+      background-color: #309ea35e;  /*New*/
     }
     @media (max-width: 768px) {
       .top-bar {
@@ -141,8 +145,8 @@
         justify-content: flex-end;
         align-items: center;
         order: 1;
-        margin-left: 54rem;
-        margin-top: -2.8rem;
+        margin-left: 42rem;
+        margin-top: 0.2rem;
       }
       .top-controls select,
       .top-controls input {
@@ -421,27 +425,90 @@
 .status-filter select:focus {
   border-color: #999;
 }
+
+.gradient-header {
+      background: linear-gradient(90deg, #77c1c9 0%, #7ce7508c 100%);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: -0.9rem;    
+      width: 82.5rem;
+      margin-left: -1.1rem;
+    }
+    /* Make all text and icons inside header white */
+    .gradient-header,
+    .gradient-header * {
+      color: #fff !important;           /* Set text color to white */
+      font-weight: bold !important;     /* Make all text bold */
+      font-size: medium  !important;      /* Make all text small */
+    }    
     
-  </style>    
+       /* PAGINATION STYLE */
+    .pagination-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0.5rem 0 0.2rem 0;
+      width: 100%;
+    }
+    .pagination-btn {
+      background: #ccc;
+      color: #222;
+      border: none;
+      border-radius: 4px;
+      padding: 0.32em 0.68em;
+      font-size: 1em;
+      cursor: pointer;
+      font-weight: 600;
+      min-width: 2em;
+      transition: background 0.2s;
+    }
+    .pagination-btn.active,
+    .pagination-btn:focus {
+      background: #1e40af;
+      color: #fff;
+    }
+    .pagination-btn:disabled {
+      background: #f3f4f6;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    .pagination-ellipsis {
+      padding: 0 0.35em;
+      color: #888;
+      font-size: 1.1em;
+      user-select: none;
+    }
+    
+  </style>  
 </head>
 <body>
-<div id="toast-container" class="toast-container"></div>
 
-<header style="background-color: #eae6ff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: -0.9rem;">
+<div id="toast-container" class="toast-container"></div>
+    
+  <header class="gradient-header">
   <div style="display: flex; align-items: center; gap: 0.5rem;">
+  
     <a href="/dashboard/manager" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
       <i class="fa-solid fa-arrow-left"></i>
     </a>
-    <i class="fa-solid fa-clipboard-list" style="color: #1e40af; font-size: 1.2rem;"></i>
     <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Task List View</h2>
   </div>
-  <a href="/" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
-    <i class="fas fa-power-off"></i> Logout
-  </a>
 </header>
 
 <div class="top-bar" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding: 1rem 0;">
   <div class="top-controls">
+  
+    <select id="statusDropdown" onchange="handleStatusDropdownChange(this.value)">
+  <option value="All">All</option>
+  <option value="Blocked">Blocked</option>
+  <option value="Not Started">Not Started</option>
+  <option value="In Progress">In Progress</option>
+  <option value="Completion Request">Completion Request</option>
+  <option value="Completed">Completed</option>
+</select>
     <select id="viewFilter">
       <option value="Cards">Cards</option>
       <option value="Table">Table</option>
@@ -453,17 +520,7 @@
     <input type="text" id="searchBox" placeholder="Search tasks..." />
   </div>
 <!-- Status Filter Dropdown -->
-<div class="status-filter">
-  <select id="statusDropdown" onchange="handleStatusDropdownChange(this.value)">
-  <option value="All">All</option>
-  <option value="Blocked">Blocked</option>
-  <option value="Not Started">Not Started</option>
-  <option value="In Progress">In Progress</option>
-  <option value="Completion Request">Completion Request</option>
-  <option value="Completed">Completed</option>
-</select>
 
-</div>
 </div>
 
 <div id="editTaskPopup" class="popup-overlay" style="display: none;">
@@ -575,25 +632,67 @@ function showToast(type, title, message) {
         }
     }, 5000);
 }
+
  function handleStatusDropdownChange(selectedStatus) {
-   currentStatus = selectedStatus;
-   renderTasks();
-} 
+	  currentStatus = selectedStatus;
+	  renderTasks();
+	} 
 
 let tasks = [];
 let currentView = "Cards";
 let currentStatus = "All";
 let searchQuery = "";
+let fullDetailsPage = 1;
+let tablePage = 1;
+const pageSize = 10;
 
 async function fetchTasks() {
   try {
-    const res = await fetch("/api/manager/allTask");
+    const res = await fetch("/api/manager/allTasks");
     tasks = await res.json();
     renderTasks();
   } catch (err) {
     console.error("Error fetching tasks:", err);
   }
 }
+
+//Helper: returns HTML for pagination controls
+function renderPagination(page, pageCount, onPage) {
+// Page numbers logic (show always first, last, current, +/-1, use ellipsis if gap)
+let html = '';
+if (pageCount <= 1) return ""; // Don't show if only one page
+
+function pageBtn(num, active) {
+ return `<button class="pagination-btn${active ? " active" : ""}" data-page="${num}"${active ? ' tabindex="0"' : ''}>${num}</button>`;
+}
+
+// Always show first page
+html += pageBtn(1, page === 1);
+
+// Show ... if needed
+if (page > 3) html += `<span class="pagination-ellipsis">…</span>`;
+
+// Show previous, current, next (excluding first/last)
+for (let i = Math.max(2, page - 1); i <= Math.min(pageCount - 1, page + 1); i++) {
+ if (i === 1 || i === pageCount) continue;
+ html += pageBtn(i, i === page);
+}
+
+// Show ... if needed
+if (page < pageCount - 2) html += `<span class="pagination-ellipsis">…</span>`;
+
+// Always show last page if more than one
+if (pageCount > 1) html += pageBtn(pageCount, page === pageCount);
+
+// Prev & Next
+html = `
+ <button class="pagination-btn" data-page="prev" ${page === 1 ? "disabled" : ""}>&laquo;</button>
+ ${html}
+ <button class="pagination-btn" data-page="next" ${page === pageCount ? "disabled" : ""}>&raquo;</button>
+`;
+return `<div class="pagination-container">${html}</div>`;
+}
+
 
 function renderTasks() {
   const container = document.getElementById("task-container");
@@ -634,44 +733,77 @@ function renderTasks() {
             <span class="tag ${task.status?.replace(" ", "-").toLowerCase()}">${task.status}</span>
             <span class="tag area">${task.area}</span>
           </div>
-          <div><strong>Due:</strong> ${task.end_date || '_'}</div>
+          <div><strong>Due:</strong> ${task.end_date}</div>
         </div>
       </div>
     `).join("");
   } else if (currentView === "Table") {
-    container.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-          <th>Task No.</th> <th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Storypoints</th><th>Start Date</th><th>Due Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filtered.map(task => `
-            <tr class="priority-${task.priority?.toLowerCase() || 'none'}">
-              <td>${task.id}</td>
-              <td>${task.description}</td>
-              <td>${task.department}</td>
-              <td>${task.status}</td>
-              <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
-              <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
-              <td>${task.start_date ||'-'}</td>
-              <td>${task.end_date ||'-'}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    `;
+	  
+	// Table pagination
+	    const pageCount = Math.ceil(filtered.length / pageSize);
+	    if (tablePage > pageCount) tablePage = pageCount > 0 ? pageCount : 1;
+	    const startIdx = (tablePage - 1) * pageSize;
+	    const endIdx = startIdx + pageSize;
+	    const paginated = filtered.slice(startIdx, endIdx);
+
+	    container.innerHTML = `
+	      <table>
+	        <thead>
+	          <tr>
+	          <th>Task No.</th> <th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Storypoints</th><th>Start Date</th><th>Due Date</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          ${paginated.map(task => `
+	            <tr class="priority-${task.priority?.toLowerCase() || 'none'}">
+	              <td>${task.id}</td>
+	              <td>${task.description}</td>
+	              <td>${task.department}</td>
+	              <td>${task.status}</td>
+	              <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
+	              <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
+	              <td>${task.start_date ||'-'}</td>
+	              <td>${task.end_date ||'-'}</td>
+	            </tr>
+	          `).join("")}
+	        </tbody>
+	      </table>
+	      ${renderPagination(tablePage, pageCount, (p) => { tablePage = p; renderTasks(); })}
+	    `;
+
+	    // Pagination event listeners
+	    document.querySelectorAll(".pagination-btn").forEach(btn => {
+	      btn.onclick = function() {
+	        let pageAttr = this.getAttribute("data-page");
+	        if (pageAttr === "prev") {
+	          if (tablePage > 1) tablePage--;
+	        } else if (pageAttr === "next") {
+	          if (tablePage < pageCount) tablePage++;
+	        } else {
+	          tablePage = Number(pageAttr);
+	        }
+	        renderTasks();
+	      };
+	    }); 
+	    
   } else {
+	  
+	// PAGINATION for Full Details
+	    const pageCount = Math.ceil(filtered.length / pageSize);
+	    if (fullDetailsPage > pageCount) fullDetailsPage = pageCount > 0 ? pageCount : 1;
+	    const startIdx = (fullDetailsPage - 1) * pageSize;
+	    const endIdx = startIdx + pageSize;
+	    const paginated = filtered.slice(startIdx, endIdx);
+	    
     container.innerHTML = `
       <table>
         <thead>
           <tr>
-            <th>Task No.</th><th>Description</th><th>Department</th><th>Area</th><th>Sub-area</th><th>Priority</th><th>Person</th><th>Storypoints</th><th>Start Date</th><th>End Date</th><th>Status</th><th>Completion Date</th><th>Bottlenecks</th><th>Remarks</th><th>Action</th>
+            <th>Task No.</th><th>Description</th><th>Department</th><th>Area</th><th>Sub-area</th><th>Priority</th><th>Person</th><th>Storypoints</th><th>Start Date</th><th>End Date</th><th>Status</th><th>Completion Date</th><th>Bottlenecks</th><th>Remarks</th><th>Update</th>
           </tr>
         </thead>
         <tbody>
-          ${filtered.map((task, i) => `
+          ${paginated.map((task, i) => `
             <tr class="priority-${task.priority?.toLowerCase() || 'none'}">
               <td>${task.id}</td>
               <td>${task.description}</td>
@@ -679,7 +811,7 @@ function renderTasks() {
               <td>${task.area || '-'}</td>
               <td>${task.sub_area || '-'}</td>
               <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
-              <td>${task.person}</td>
+              <td>${task.person || '-'}</td>
               <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
               <td>${task.start_date ||'-'}</td>
               <td>${task.end_date ||'-'}</td>
@@ -691,7 +823,7 @@ function renderTasks() {
                 <button class="edit-btn" title="Edit" style="background:none; border:none; cursor:pointer;" onclick="openEditTaskPopup(${task.id})">
                   <i class="fa fa-pen"></i>
                 </button>
-                 <button class="delete-btn" title="Delete" onclick="confirmDeleteTask(${task.id})">
+                <button class="delete-btn" title="Delete" onclick="confirmDeleteTask(${task.id})">
                 <i class="fa fa-trash" style="color:red;"></i>
               </button>
               </td>
@@ -699,28 +831,48 @@ function renderTasks() {
           `).join("")}
         </tbody>
       </table>
+      
+      ${renderPagination(fullDetailsPage, pageCount, (p) => { fullDetailsPage = p; renderTasks(); })}
+      
     `;
+    
+
+    // Pagination event listeners
+    document.querySelectorAll(".pagination-btn").forEach(btn => {
+      btn.onclick = function() {
+        let pageAttr = this.getAttribute("data-page");
+        if (pageAttr === "prev") {
+          if (fullDetailsPage > 1) fullDetailsPage--;
+        } else if (pageAttr === "next") {
+          if (fullDetailsPage < pageCount) fullDetailsPage++;
+        } else {
+          fullDetailsPage = Number(pageAttr);
+        }
+        renderTasks();
+      };
+    });
+    
   }
 }
 
-document.getElementById("viewFilter").addEventListener("change", (e) => {
-  currentView = e.target.value;
-  renderTasks();
-});
-
-document.getElementById("searchBox").addEventListener("input", (e) => {
-  searchQuery = e.target.value;
-  renderTasks();
-});
-
-document.querySelectorAll('.status-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentStatus = btn.dataset.status;
-    renderTasks();
-  });
-});
+ document.getElementById("viewFilter").addEventListener("change", (e) => {
+	  currentView = e.target.value;
+	  if (currentView === "Full Details") fullDetailsPage = 1;
+	  if (currentView === "Table") tablePage = 1;
+	  renderTasks();
+	});
+	document.getElementById("searchBox").addEventListener("input", (e) => {
+	  searchQuery = e.target.value;
+	  if (currentView === "Full Details") fullDetailsPage = 1;
+	  if (currentView === "Table") tablePage = 1;
+	  renderTasks();
+	});
+	document.getElementById('statusDropdown').addEventListener('change', function() {
+		  currentStatus = this.value;
+		  if (currentView === "Full Details") fullDetailsPage = 1;
+		  if (currentView === "Table") tablePage = 1;
+		  renderTasks();
+		}); 
 
 document.getElementById("exportBtn").addEventListener("click", () => {
   const rows = [["Description", "Status", "Priority", "Points", "Due Date"]];
@@ -743,30 +895,33 @@ document.getElementById("exportBtn").addEventListener("click", () => {
 
 let currentEditTaskIndex = null;
 
+//Open the edit task popup and prefill the form
 function openEditTaskPopup(index) {
-  currentEditTaskIndex = tasks.findIndex(task => task.id == index);
-  const task = tasks[currentEditTaskIndex];
+currentEditTaskIndex = tasks.findIndex(task => task.id == index);
+const task = tasks[currentEditTaskIndex];
 
-  document.getElementById('editDescription').value = task.description || '';
-  document.getElementById('editDepartment').value = task.department || '';
-  document.getElementById('editArea').value = task.area || '';
-  document.getElementById('editSubarea').value = task.sub_area || '';
-  document.getElementById('editPerson').value = task.person || '';
-  document.getElementById('editStartDate').value = task.start_date || '';
-  document.getElementById('editEndDate').value = task.end_date || '';
-  document.getElementById('editStorypoints').value = task.storypoints || '';
-  document.getElementById('editStatus').value = task.status || '';
-  document.getElementById('editCompletionDate').value = task.completion_date || '';
-  document.getElementById('editPriority').value = task.priority || '';
-  document.getElementById('editBottlenecks').value = task.bottlenecks || '';
-  document.getElementById('editRemarks').value = task.remarks || '';
+document.getElementById('editDescription').value = task.description || '';
+document.getElementById('editDepartment').value = task.department || '';
+document.getElementById('editArea').value = task.area || '';
+document.getElementById('editSubarea').value = task.sub_area || '';
+document.getElementById('editPerson').value = task.person || '';
+document.getElementById('editStartDate').value = task.start_date || '';
+document.getElementById('editEndDate').value = task.end_date || '';
+document.getElementById('editStorypoints').value = task.storypoints || '';
+document.getElementById('editStatus').value = task.status || '';
+document.getElementById('editCompletionDate').value = task.completion_date || '';
+document.getElementById('editPriority').value = task.priority || '';
+document.getElementById('editBottlenecks').value = task.bottlenecks || '';
+document.getElementById('editRemarks').value = task.remarks || '';
 
-  document.getElementById('editTaskPopup').style.display = 'flex';
+document.getElementById('editTaskPopup').style.display = 'flex';
 }
 
+//Close the edit task popup
 function closeEditTaskPopup() {
-  document.getElementById('editTaskPopup').style.display = 'none';
+document.getElementById('editTaskPopup').style.display = 'none';
 }
+
 //Handle task edit form submission
 document.getElementById('editTaskForm').addEventListener('submit', function (e) {
 e.preventDefault();
@@ -838,7 +993,8 @@ fetch(`/api/manager/updateTask/${updatedTask.id}`, {
 //Call this function initially to load tasks
 fetchTasks();
 
-  async function confirmDeleteTask(taskId) {
+
+	  async function confirmDeleteTask(taskId) {
 		  const result = await Swal.fire({
 		    title: `Delete Task ID: ${taskId}?`,
 		    text: "This action cannot be undone.",
