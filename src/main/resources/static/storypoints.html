@@ -168,33 +168,56 @@ table tr:nth-child(odd) {
     }
     
     
+    .gradient-header {
+    background: linear-gradient(90deg, #77c1c9 0%, #7ce7508c 100%);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.1rem;
+   }
+    
+   .gradient-header,
+.gradient-header * {
+  color: #fff !important;           /* Set text color to white */
+  font-weight: bold !important;     /* Make all text bold */
+  font-size: medium !important;     /* Make all text small */
+}   
+    
+  .fa-rainbow {
+background: linear-gradient(270deg, #eaed68, #dd920a, #fff, #47c2ff, #cc4feb);
+    background-size: 1000% 1000%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbow-move 3s linear infinite;
+}
+@keyframes rainbow-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}  
+    
   </style>
 </head>
 <body>
 
-
-<header style="background-color: #eae6ff; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-top: -0.9rem;">
+<header class="gradient-header">
   <!-- Left side: Icon and Title -->
   <div style="display: flex; align-items: center; gap: 0.5rem;">
-   <a href=" /dashboard/manager " style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
-    <i class="fa-solid fa-arrow-left"></i>
-  </a>
-    <i class="fa-solid fa-list-check" style="color: #1e40af; font-size: 1.2rem;"></i>
+  <a href="/dashboard/manager" style="font-size: 1.2rem; text-decoration: none;">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
     <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Story Points</h2>
-  </div>
-
-  
+  </div>  
 </header>
-
-
+<div class="card table-container">
   <div class="filters">
    <div class="right-controls">
     <i class="fas fa-search"></i>
-    <input class="search-box" type="text" placeholder="Search by Name" />
+    <input class="search-box" type="text" placeholder="Search by email" />
   </div>
   </div>
 
-<div class="card table-container">
+<!-- <div class="card table-container"> -->
   <table>
     <thead>
       <tr>
@@ -211,8 +234,6 @@ table tr:nth-child(odd) {
     </tbody>
   </table>
 </div>
-
-
 <script>
   // Fetch tasks and populate summary table
   fetch("/api/manager/allTasks")
@@ -221,7 +242,7 @@ table tr:nth-child(odd) {
       const summary = {};
 
       data.forEach(task => {
-        const email = task.person || 'Unassigned';
+         const email = task.person || 'Unassigned'; 
 
         if (!summary[email]) {
           summary[email] = {
@@ -266,46 +287,26 @@ table tr:nth-child(odd) {
         <tr><td colspan="5">Failed to load data</td></tr>
       `;
     });
+   
+  document.addEventListener('DOMContentLoaded', function () {
+	    document.querySelector('.search-box').addEventListener('input', function () {
+	      const query = this.value.toLowerCase();
+	      const rows = document.querySelectorAll('#taskSummaryBody tr');
 
-  // Search filter by name/email
-  document.querySelector('.search-box').addEventListener('input', function () {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#taskSummaryBody tr');
+	      rows.forEach(row => {
+	        // Get the Name column (second td)
+	        const nameCell = row.querySelectorAll('td')[1];
+	        const nameText = nameCell ? nameCell.textContent.toLowerCase() : '';
 
-    rows.forEach(row => {
-      const nameCell = row.querySelectorAll('td')[1]; // index 1 = Name column
-      const nameText = nameCell ? nameCell.textContent.toLowerCase() : '';
+	        if (nameText.includes(query)) {
+	          row.style.display = '';
+	        } else {
+	          row.style.display = 'none';
+	        }
+	      });
+	    });
+	  });  
 
-      if (nameText.includes(query)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
-    });
-  });
 </script>
-
-
-
-<script>
-  // Attach search logic
-  document.querySelector('.search-box').addEventListener('input', function () {
-    const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#taskSummaryBody tr');
-
-    rows.forEach(row => {
-      const nameCell = row.querySelector('td');
-      const nameText = nameCell ? nameCell.textContent.toLowerCase() : '';
-
-      if (nameText.includes(query)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
-    });
-  });
-</script>
-
-
 </body>
 </html>
