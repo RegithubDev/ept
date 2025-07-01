@@ -648,7 +648,7 @@ const pageSize = 10;
 
 async function fetchTasks() {
   try {
-    const res = await fetch("/api/manager/allTasks");
+    const res = await fetch("/api/manager/allTask");
     tasks = await res.json();
     renderTasks();
   } catch (err) {
