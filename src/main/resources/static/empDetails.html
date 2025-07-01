@@ -61,7 +61,7 @@
     }
     .title-section .page-index {
       display: inline-block;
-      background-color: #e74c3c;
+      background-color:#969995;
       color: #fff;
       font-weight: 600;
       border-radius: 4px;
@@ -265,61 +265,19 @@
       90% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-20px); }
     }
-     
-
   </style>
 </head>
 <body>
 
 <div id="toast-container" class="toast-container"></div>
-
-
   <!-- Global Header -->
- <header style="background-color: #eae6ff;padding: 1rem;display: flex;justify-content: space-between;align-items: center;margin-top: -0.9rem;margin-left: 1rem;width: 81rem;">
-  <div style="display: flex; align-items: center; gap: 0.5rem;">
-    <a href="/dashboard/manager" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
+  <header style="background: linear-gradient(90deg, #77c1c9 0%, #7ce7508c 100%);padding: 0.9rem;display: flex;justify-content: space-between;align-items: center;margin-top: 0.1rem;position: relative;"> 
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <a href="/dashboard/manager" style="color: #fff; font-size: 1.2rem; text-decoration: none;">
       <i class="fa-solid fa-arrow-left"></i>
     </a>
-    <i class="fas fa-users" style="color: #1e40af; font-size: 1.2rem;"></i>
-    <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Employees Data</h2>
+    <h2 style="margin: 0; font-size: medium; font-weight: bold; color:#fff;">Employees Data</h2>
   </div>
-  
-    <div style="display: flex; align-items: center; gap: 1rem; position: relative;">
-      <!-- Dark Mode & Monochrome Toggles -->
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <!-- Dark Mode Toggle -->
-        <label title="Toggle Dark Mode" style="cursor: pointer;">
-          <input type="checkbox" id="darkModeToggle" style="display:none;" />
-          <i class="fa-solid fa-moon" id="darkModeIcon" style="color: #d5cf1d;"></i>
-        </label>
-      </div>
- 
-      <!-- Notification Icon & Dropdown -->
-<a href="javascript:void(0);" id="notificationIcon" title="Notifications" style="color: #1e40af; font-size: 1.4rem; position: relative;">
-  <i class="fa-solid fa-bell"></i>
-  <span class="notification-badge" id="notificationCount" style="display:none;">0</span>
-</a>
-<div class="notification-dropdown" id="notificationDropdown" style="display:none;">
-  <div class="notification-dropdown-header">Notifications</div>
-  <ul class="notification-list" id="notificationList">
-    <!-- JS will populate -->
-  </ul>
-  <div class="notification-dropdown-empty" id="notificationEmpty" style="display:none;">
-    <i class="fa-regular fa-bell"></i> No new notifications.
-  </div>
-</div>
-
-<!-- Profile Icon & Dropdown -->
-
-<div class="profile-container" style="position: relative; display:inline-block;">
-  <i class="fas fa-user profile-icon" id="profileIcon" style="font-size:1.4rem; color:#1e40af; cursor:pointer;"></i>
-  <div class="dropdown" id="profileDropdown" style="display:none; position:absolute; right:0; top:110%;">
-    <a href="/profile"><i class="fas fa-id-badge"></i>Profile</a>
-    <a href="/employee/profile"><i class="fas fa-users"></i>Employee Profile</a>
-    <a href="/login" onclick="localStorage.clear();"><i class="fas fa-power-off"></i> Logout</a>
-  </div>
-</div>
-    </div>
   </header>
 
 <div class="container">
@@ -403,8 +361,6 @@ function userCard(user) {
 	  `;
 	}
 
-
-
 // Fetch users from backend
 document.addEventListener("DOMContentLoaded", function () {
   const usersGrid = document.getElementById("usersGrid");
@@ -422,7 +378,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function deleteUser(email) {
+	function deleteUser(email) {
 		  Swal.fire({
 		    title: `Are you sure you want to delete ${email}?`,
 		    icon: 'warning',
@@ -439,9 +395,10 @@ function deleteUser(email) {
 		    }
 		  }).then((result) => {
 		    if (result.isConfirmed) {
-		      
+		      // 🔔 Immediate toast
 		      showToast("info", "⏳ Deleting...", "Please wait while we delete the employee.");
 
+		      // 🔄 API call
 		      fetch(`/api/manager/deleteUser/${encodeURIComponent(email)}`, {
 		        method: "DELETE"
 		      })
@@ -456,6 +413,7 @@ function deleteUser(email) {
 		    }
 		  });
 		}
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
