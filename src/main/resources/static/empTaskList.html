@@ -98,7 +98,7 @@
       text-align: left;
     }
     thead {
-      background: #f0f0f0;
+      background: #309ea35e;
     }
     tr {
       border-top: 1px solid #ddd;
@@ -138,7 +138,7 @@
         justify-content: flex-end;
         align-items: center;
         order: 1; /* Comes after status buttons */
-        margin-left: 29rem;
+        margin-left: 41.2rem;
        
       }
       .top-controls select,
@@ -328,7 +328,8 @@
       .popup-form .form-grid {
         grid-template-columns: 1fr; /* keep 1 column for narrow screens */
       }
-    }    
+    }
+    
      .toast-container {
       position: fixed;
       top: 20px;
@@ -338,6 +339,7 @@
       flex-direction: column;
       align-items: flex-end;
     }
+
     .toast {
       position: relative;
       min-width: 250px;
@@ -411,31 +413,63 @@
   text-indent: 0px;         
 }
 
+
+
 .status-filter select:focus {
   border-color: #999;
-}    
+}
+
+.gradient-header {
+      background: linear-gradient(90deg, #77c1c9 0%, #7ce7508c 100%);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: -0.9rem;    
+      width: 82.5rem;
+      margin-left: -1.1rem;
+    }
+    /* Make all text and icons inside header white */
+    .gradient-header,
+    .gradient-header * {
+      color: #fff !important;           /* Set text color to white */
+      font-weight: bold !important;     /* Make all text bold */
+      font-size: medium !important;      /* Make all text small */
+    }
+    
   </style>
 </head>
+
 <body>
 
 <div id="toast-container" class="toast-container"></div>
 
 
-<header style="background-color: #eae6ff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: -0.9rem;">
+<header class="gradient-header">
   <div style="display: flex; align-items: center; gap: 0.5rem;">
     <a href="/dashboard/employee" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
       <i class="fa-solid fa-arrow-left"></i>
     </a>
-    <i class="fa-solid fa-clipboard-list" style="color: #1e40af; font-size: 1.2rem;"></i>
+     <!-- <i class="fa-solid fa-list-check" style="font-size: 1.2rem;"></i> -->
     <h2 style="margin: 0; font-size: 1.2rem; font-weight: bold;">Task List View</h2>
   </div>
-  <a href="/" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
-    <i class="fa-solid fa-right-from-bracket"></i> Logout
+  <a href="/login" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
+  <!--  <i class="fas fa-power-off"></i> Logout -->
   </a>
 </header>
 
 <div class="top-bar" style="display: flex; flex-wrap: nowrap; gap: 13.5rem; align-items: center; padding: 1rem 0; flex-wrap: nowrap; overflow-x: auto;">
   <div class="top-controls" style="display: flex; gap: 0.5rem; align-items: center;">
+    <select id="statusDropdown" onchange="handleStatusChange(this.value)">
+    <option value="All">All</option>
+    <option value="Blocked">Blocked</option>
+    <option value="Not started">Not started</option>
+    <option value="In Progress">In Progress</option>
+    <option value="Completed">Completed</option>
+    <option value="Completion Request">Completion Request</option>
+  </select>
+  
+  
     <select id="viewFilter">
       <option value="Cards">Cards</option>
       <option value="Table">Table</option>
@@ -446,18 +480,7 @@
     </button>
     <input type="text" id="searchBox" placeholder="Search tasks..." />
   </div>
- 
-<div class="status-filter">
-  <select id="statusDropdown" onchange="handleStatusChange(this.value)">
-    <option value="All">All</option>
-    <option value="Blocked">Blocked</option>
-    <option value="Not started">Not started</option>
-    <option value="In Progress">In Progress</option>
-    <option value="Completed">Completed</option>
-    <option value="Completion Request">Completion Request</option>
-  </select>
-</div>
-  
+
 </div>
 
 <div id="task-container"></div>
@@ -499,10 +522,7 @@
         End Date:
         <input id="endDate" type="date" placeholder="dd-mm-yyyy" disabled/>
       </label>     
-      <!-- <label>
-        StoryPoints:
-        <input id="storypoints" type="number" min="0" placeholder="Enter storypoints" disabled />
-      </label> -->
+
       <label>
         Status:
         <select id="status" required>
@@ -568,10 +588,11 @@ function showToast(type, title, message) {
 }
 
 function handleStatusChange(selectedStatus) {
- currentStatus = selectedStatus;
- renderTasks(tasksInfo);
-}
-	
+	  currentStatus = selectedStatus;
+	  renderTasks(tasksInfo);
+	}
+
+
 let tasksInfo = [];
 
 function fetchTasks() {
@@ -590,123 +611,155 @@ function fetchTasks() {
     });
 }
 
+
+let currentView = "Cards";
+let currentStatus = "All";
+let searchQuery = "";
+let currentPage = 1;
+const pageSize = 10;
+ 
 // Simulate synchronous-like flow using Promise chaining
 fetchTasks().then(() => {
   renderTasks(tasksInfo); // Only runs after tasksInfo is fully populated
 });
 
-let currentView = document.getElementById("viewFilter").value;
-let currentStatus = "All";
-let searchQuery = "";
 
 function renderTasks(tasks) {
-  const container = document.getElementById("task-container");
-  let filtered = tasks.filter(t =>
-    (currentStatus === "All" || t.status.toLowerCase() === currentStatus.toLowerCase()) &&
-    (
-      !searchQuery ||
-      (t.title && t.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (t.remarks && t.remarks.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (t.person && t.person.toLowerCase().includes(searchQuery.toLowerCase()))
-    )
-  );
+	  const container = document.getElementById("task-container");
+	  const pagination = document.getElementById("pagination-controls");
+	  // Filtering
+	  let filtered = tasks.filter(t =>
+	    (currentStatus === "All" || t.status?.toLowerCase() === currentStatus.toLowerCase()) &&
+	    (!searchQuery ||
+	      (t.description && t.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+	      (t.remarks && t.remarks.toLowerCase().includes(searchQuery.toLowerCase())) ||
+	      (t.person && t.person.toLowerCase().includes(searchQuery.toLowerCase()))
+	    )
+	  );
+
+//Pagination logic
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  if (currentPage > totalPages) currentPage = totalPages || 1;
+  const startIdx = (currentPage - 1) * pageSize;
+  const endIdx = startIdx + pageSize;
+  const paginated = filtered.slice(startIdx, endIdx);
 
   if (currentView === "Cards") {
-    container.innerHTML = filtered.map(task => `
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <h3>${task.description}</h3>
-            <p>${task.remarks}</p>
-          </div>
-          <div class="card-tags-right">
-            <span class="tag ${task.priority.toLowerCase()}">${task.priority}</span>
-            <span class="tag points">${(task.storypoints == null)?"-":(task.storypoints == 0 ?"-":task.storypoints)} pts</span>
-          </div>
-        </div>
-        <div class="card-footer">
-          <div>
-            <span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span>
-            <span class="tag area">${task.area}</span>
-          </div>
-          <div><strong>Due:</strong> ${task.end_date || '-'}</div>
-        </div>
-      </div>
-    `).join("");
-  } else if (currentView === "Table") {
-    container.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-          <th>Sl.No</th><th>Description</th><th>Department</th><th>Status</th><th>Priority</th><!--<th>StoryPoints</th>--><th>Start Date</th><th>Due Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filtered.map((task,i) => `
-            <tr>
-              <td>${i+1}</td>
-              <td>${task.description}</td>
-              <td>${task.department}</td>
-              <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
-              <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
-              <!-- <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td> -->
-              <td>${task.start_date || '-'}</td>
-              <td>${task.end_date || '-'}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    `;
-  } else {
-    container.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Sl.No.</th>
-            <th>Task No.</th>
-            <th>Description</th>
-            <th>Department</th>
-            <th>Area</th>
-            <th>Sub-area</th>
-            <th>Priority</th>
-            <th>Person</th>
-           <!-- <th>StoryPoints</th> -->
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Status</th>
-            <th>Bottlenecks</th>
-            <th>Remarks</th>
-            <th>Update</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filtered.map((task, i) => `
-            <tr>
-              <td>${i+1}</td>             
-              <td>${task.id}</td>
-              <td>${task.description}</td>
-              <td>${task.department}</td>
-              <td>${task.area}</td>
-              <td>${task.sub_area}</td>
-              <td><span class="tag ${task.priority.toLowerCase()}">${task.priority}</span></td>
-              <td>${task.person}</td>
-              <!-- <td>${(task.storypoints == null)?"-":task.storypoints == 0 ?"-":task.storypoints}</td> -->
-              <td>${task.start_date || '-'}</td>
-              <td>${task.end_date || '-'}</td>
-              <td><span class="tag ${task.status.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
-              <td>${task.bottlenecks}</td>
-              <td>${task.remarks}</td>
-              <td>
-                <button class="edit-btn" title="Edit" onclick="openEditTaskPopup(${task.id})">
-                  <i class="fa fa-pen"></i>
-                </button>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    `;
+	    container.innerHTML = paginated.map(task => `
+	      <div class="card">
+	        <div class="card-header">
+	          <div class="card-title">
+	            <h3>${task.description}</h3>
+	            <p>${task.remarks}</p>
+	          </div>
+	          <div class="card-tags-right">
+	            <span class="tag ${task.priority?.toLowerCase()}">${task.priority}</span>
+	            <span class="tag points">${(task.storypoints == null)?"-":(task.storypoints == 0 ?"-":task.storypoints)} pts</span>
+	          </div>
+	        </div>
+	        <div class="card-footer">
+	          <div>
+	            <span class="tag ${task.status?.replace(" ", "-").toLowerCase()}">${task.status}</span>
+	            <span class="tag area">${task.area}</span>
+	          </div>
+	          <div><strong>Due:</strong> ${task.end_date || '-'}</div>
+	        </div>
+	      </div>
+	    `).join("");
+	  } else if (currentView === "Table") {
+	    container.innerHTML = `
+	      <table>
+	        <thead>
+	          <tr>
+	          <th>Sl.No</th><th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Start Date</th><th>Due Date</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          ${paginated.map((task,i) => `
+	            <tr>
+	              <td>${startIdx + i + 1}</td>
+	              <td>${task.description}</td>
+	              <td>${task.department}</td>
+	              <td><span class="tag ${task.status?.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
+	              <td><span class="tag ${task.priority?.toLowerCase()}">${task.priority}</span></td>
+	              <td>${task.start_date || '-'}</td>
+	              <td>${task.end_date || '-'}</td>
+	            </tr>
+	          `).join("")}
+	        </tbody>
+	      </table>
+	    `;
+	  } else {
+	    container.innerHTML = `
+	      <table>
+	        <thead>
+	          <tr>
+	            <th>Sl.No.</th>
+	            <th>Task No.</th>
+	            <th>Description</th>
+	            <th>Department</th>
+	            <th>Area</th>
+	            <th>Sub-area</th>
+	            <th>Priority</th>
+	            <th>Person</th>
+	            <th>Start Date</th>
+	            <th>End Date</th>
+	            <th>Status</th>
+	            <th>Bottlenecks</th>
+	            <th>Remarks</th>
+	            <th>Update</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          ${paginated.map((task, i) => `
+	            <tr>
+	              <td>${startIdx + i + 1}</td>
+	              <td>${task.id}</td>
+	              <td>${task.description}</td>
+	              <td>${task.department}</td>
+	              <td>${task.area}</td>
+	              <td>${task.sub_area}</td>
+	              <td><span class="tag ${task.priority?.toLowerCase()}">${task.priority}</span></td>
+	              <td>${task.person}</td>
+	              <td>${task.start_date || '-'}</td>
+	              <td>${task.end_date || '-'}</td>
+	              <td><span class="tag ${task.status?.replace(" ", "-").toLowerCase()}">${task.status}</span></td>
+	              <td>${task.bottlenecks}</td>
+	              <td>${task.remarks}</td>
+	              <td>
+	                <button class="edit-btn" title="Edit" onclick="openEditTaskPopup(${task.id})">
+	                  <i class="fa fa-pen"></i>
+	                </button>
+	              </td>
+	            </tr>
+	          `).join("")}
+	        </tbody>
+	      </table>
+	    `;
+	  }
+  
+//Render pagination controls
+  let controls = '';
+  if (totalPages > 1) {
+    controls += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(1)">« First</button>`;
+    controls += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">‹ Prev</button>`;
+    let pageStart = Math.max(1, currentPage - 2);
+    let pageEnd = Math.min(totalPages, currentPage + 2);
+    for (let p = pageStart; p <= pageEnd; p++) {
+      controls += `<button ${p === currentPage ? 'style="background:#1e40af;color:white;" disabled' : ''} onclick="changePage(${p})">${p}</button>`;
+    }
+    controls += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">Next ›</button>`;
+    controls += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${totalPages})">Last »</button>`;
   }
+  pagination.innerHTML = controls;
+}
+
+// Pagination navigation - must be global
+function changePage(page) {
+  event.preventDefault();
+  currentPage = page;
+  renderTasks(tasksInfo);
 }
 
 // Popup logic
@@ -798,6 +851,7 @@ document.getElementById("taskForm").addEventListener("submit", async function(ev
 	    submitBtn.innerText = originalText;
 	  }
 	});
+
 // Optional: Clicking outside the form closes popup
 document.getElementById("taskPopup").addEventListener("click", function(e) {
   if (e.target === this) closeTaskPopup();
