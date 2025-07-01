@@ -39,18 +39,11 @@
       font-size: medium;
     }
 
-   /*  .profile-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
- */
- 
  .profile-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: -4rem;
 }
 
 .profile-title-centered {
@@ -186,7 +179,7 @@
       border-radius: 5px;
       font-weight: bold;
       font-size: 1rem;
-      background-color: #6b6adfc7;
+      background-color: #5857ebc7;
       color: white;
       cursor: pointer;
       margin-top:41px;
@@ -239,8 +232,6 @@
   flex-direction: column;
   align-items: flex-end;
 }
-
-
     .toast {
       position: relative;
       min-width: 250px;
@@ -299,58 +290,168 @@
       90% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-20px); }
     }
+    
+     .profile-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: #f0f2f5;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    margin-top:-60px;
+  }
+
+  .profile-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+  }
+
+  .profile-header {
+    
+    height: 120px;
+    position: relative;
+  }
+
+  .profile-avatar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 50%;
+    padding: 6px;
+    box-shadow: 0 0 0 5px #fff;
+  }
+
+  .profile-avatar i {
+    font-size: 60px;
+    color: #77c1c9;
+    display: block;
+    background: #fff;
+    border-radius: 50%;
+    padding: 0.5rem;
+  }
+
+  .profile-body {
+    padding: 4rem 1.5rem 2rem;
+    text-align: center;
+  }
+
+  .name-edit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .name-edit h3 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #333;
+  }
+
+  .edit-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #3498db;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+  }
+
+  .edit-icon-btn:hover {
+    color: #1e3a8a;
+  }
+
+  .profile-details {
+    text-align: left;
+    font-size: 0.95rem;
+    color: #444;
+    margin-top: 1rem;
+  }
+
+  .profile-details label {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    margin-top: 0.8rem;
+    color: #555;
+  }
+
+  .profile-details label i {
+    margin-right: 0.5rem;
+    color: #7ce750;
+  }
+
+  .profile-details p {
+    margin: 0.2rem 0 0.8rem 1.5rem;
+    color: #666;
+  }
+
+  @media (max-width: 480px) {
+    .profile-card {
+      margin: 1rem;
+    }
+  }
+  
   </style>
   </head>
 <body>
 
-<header>
+ <div id="toast-container" class="toast-container"></div> 
 
-<div id="toast-container" class="toast-container"></div>
-
-  <a id="backLink" href="#" style="color: #1e40af; font-size: 1.2rem; text-decoration: none;">
+  <header style="background: linear-gradient(90deg, #77c1c9 0%, #7ce7508c 100%);padding: 0.9rem;display: flex;justify-content: space-between;align-items: center;margin-top: 0.1rem;position: relative;"> 
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <a id="backLink" href="#" style="color: white; font-size: 1.2rem; text-decoration: none;">
     <i class="fa-solid fa-arrow-left"></i>
   </a>
-  <h2><i class="fa-solid fa-user-circle"></i> My Profile</h2>
+     <h2 style="color: white;font-size:medium;">My Profile</h2>
+      
+    </div>
 </header>
 
 <!-- <div class="container"> -->
-<div class="profile-card">
-  <!-- <div class="profile-header">
-    <div class="profile-title">
-      <i class="fa-solid fa-user-circle"></i>
-      <h3>Loading...</h3>
+
+<div class="profile-wrapper">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <i class="fa-solid fa-user-circle"></i>
+      </div>
     </div>
-    <button class="edit-icon-btn" onclick="openEditPopup()" title="Edit Profile">
-      <i class="fa fa-pencil-alt"></i>
-    </button>
-  </div> -->
-  <div class="profile-header">
-  <div class="profile-title-centered">
-    <i class="fa-solid fa-user-circle profile-icon"></i>
-    <div class="name-edit">
-      <h3 id="profileName">Loading...</h3>
-      <button class="edit-icon-btn" onclick="openEditPopup()" title="Edit Profile">
-        <i class="fa fa-pencil-alt"></i>
-      </button>
+
+    <div class="profile-body">
+      <div class="name-edit">
+        <h3 id="profileName">Loading...</h3>
+        <button class="edit-icon-btn" onclick="openEditPopup()" title="Edit Profile">
+          <i class="fa fa-pencil-alt"></i>
+        </button>
+      </div>
+
+      <div class="profile-details">
+        <label><i class="fa-solid fa-envelope"></i> Email:</label>
+        <p id="profileEmail"></p>
+
+        <label><i class="fa-solid fa-user-tie"></i> Position:</label>
+        <p id="profileRole"></p>
+
+        <label><i class="fa-solid fa-building"></i> Department:</label>
+        <p id="profileDept"></p>
+
+        <label><i class="fa-solid fa-phone"></i> Phone:</label>
+        <p id="profilePhone"></p>
+
+        <label><i class="fa-solid fa-user-tie"></i> Reporting To:</label>
+        <p id="profileReportingTo"></p>
+      </div>
     </div>
-  </div>
-</div>
-
-  <div class="profile-details">
-    <label><i class="fa-solid fa-envelope"></i> Email:</label>
-    <p>-</p>
-
-    <label><i class="fa-solid fa-user-tie"></i> Position:</label>
-    <p>-</p>
-
-    <label><i class="fa-solid fa-building"></i> Department:</label>
-    <p>-</p>
-
-    <label><i class="fa-solid fa-phone"></i> Phone:</label>
-    <p>-</p>
-
-    <label><i class="fa-solid fa-user-tie"></i> Reporting To:</label>
-    <p>-</p>
   </div>
 </div>
 
@@ -478,9 +579,6 @@ function showToast(type, title, message) {
         console.error("Error loading user:", error);
       });
   });
-   
-   
-
 
   let currentUser = null;
 
