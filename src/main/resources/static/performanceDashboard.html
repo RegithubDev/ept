@@ -19,7 +19,8 @@
       border-radius: 15px;
       padding: 20px;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      
     }
    .header {
   display: flex;
@@ -86,80 +87,42 @@
   </style>
 </head>
 <body>
-<header class="header">
-  <div class="d-flex align-items-center gap-2">
-<!-- Back Button -->
-<a id="backBtn" style="color: #1e40af; font-size: 1.2rem; text-decoration: none; cursor: pointer;">
-  <i class="fa-solid fa-arrow-left"></i>
-</a>
-    <!-- Dashboard Icon -->
-    <i class="fa-solid fa-chart-column text-primary"></i>
-<h2 class="mb-0 fs-6 fw-bold">Performance Dashboard</h2>
-
+<!-- <header class="header">
+  <div class="d-flex align-items-center gap-2"> -->
+ <header style="background: linear-gradient(90deg, #77c1c9 0%, #7ce7508c 100%);
+               padding: 1rem;
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               margin-top: -0.9rem;
+               position: relative;
+               font-size: 0.85rem;
+               color: #fff;
+                   width: 85rem;
+    margin-left: -1rem;
+"> <!-- Corrected color property -->
+  
+  <div style="display: flex; align-items: center; gap: 0.4rem;">
+    <!-- Back Button -->
+    <a id="backBtn" style="color: #fff; font-size: 0.9rem; text-decoration: none; cursor: pointer;">
+      <i class="fa-solid fa-arrow-left" style="font-size: 0.85rem;"></i>
+    </a>
+    <!-- Title -->
+    <h2 class="mb-0 fs-6 fw-bold" style="margin: 0; font-size: 0.95rem;">Performance Dashboard</h2>
   </div>
-
-  <!-- Logout Button -->
-  <a href="/" style="color: #1e40af; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
-    <i class="fa-solid fa-right-from-bracket"></i> Logout
-  </a>
 </header>
 
-<!--    <div class="row">
-      <div class="col-md-4 mb-1">
-        <div class="card equal-height">
-          <h6>Task Status Distribution</h6>
-          <div class="chart-wrapper">
-            <canvas id="statusChart"></canvas>
-          </div>
-          <div class="status-labels text-center mt-2">
-            <span class="text-primary">● Completed</span>
-            <span class="text-warning">● In Progress</span>
-            <span class="text-danger">● Pending</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-8 mb-3">
-        <div class="card equal-height">
-          <h6>Task Completion Over Time</h6>
-          <div class="chart-wrapper">
-            <canvas id="completionChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  <div class="row">
-  <div class="col-12 col-md-6">
-    <div class="summary-box">
-      <h4>4.2</h4>
-      <p>Avg Rating</p>
-    </div>
-  </div>
-  <div class="col-12 col-md-6">
-    <div class="summary-box">
-      <h4 class="text-success">89%</h4>
-      <p>On-time Rate</p>
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <h5>Performance Summary</h5>
-  <p>Tasks Completed This Month: <strong>67</strong></p>
-  <p>Average Task Duration: <strong>2.4 days</strong></p>
-  <p>Quality Score: <strong class="text-success">Excellent</strong></p>
-</div>   -->
-<div style="width: 100%; height: 100vh;">
- <iframe 
+ <div style="width: 100%; height: 100vh;     margin-top: 2rem;">
+  <iframe 
   title="workflow"
   width="100%" 
   height="100%"   
   src="https://app.powerbi.com/view?r=eyJrIjoiMmJjZWM2MmMtYjljMC00N2VlLTljOTktMjEyMjk1MTYxZGJmIiwidCI6ImM5MzA2NWY5LTg1ODctNGJmYy05YjQzLWMyYWZhMGRjNTY1MCJ9">
-</iframe>  
+</iframe>   
 </div>
   <script>
-	   document.getElementById("backBtn").addEventListener("click", function () {
+  
+   document.getElementById("backBtn").addEventListener("click", function () {
 	  const role = localStorage.getItem("EmpRole"); // Use "EmpRole", not "userRole"
 	  console.log("Role:", role);
 
@@ -170,14 +133,15 @@
 	  } else {
 	    window.location.href = "/login"; // fallback
 	  }
-	});
-	  
+	}); 
+
+
     window.onload = function () {
       const ctxStatus = document.getElementById('statusChart').getContext('2d');
       new Chart(ctxStatus, {
         type: 'doughnut',
         data: {
-          labels: ['Completed', 'In Progress', 'Pending'],
+          labels: ['Completed', 'In Progress', 'Not Started'],
           datasets: [{
             label: 'Tasks',
             data: [65, 25, 10],
@@ -206,7 +170,7 @@
               backgroundColor: '#3b82f6'
             },
             {
-              label: 'Pending',
+              label: 'Not Started',
               data: [15, 10, 17, 8, 12, 5],
               backgroundColor: '#f59e0b'
             }
