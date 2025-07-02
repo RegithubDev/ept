@@ -500,14 +500,15 @@
 
 <div class="top-bar" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding: 1rem 0;">
   <div class="top-controls">
-    <select id="statusDropdown">
-      <option value="All">All</option>
-      <option value="Blocked">Blocked</option>
-      <option value="Not Started">Not Started</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Completion Request">Completion Request</option>
-      <option value="Completed">Completed</option>
-    </select>
+  
+    <select id="statusDropdown" onchange="handleStatusDropdownChange(this.value)">
+  <option value="All">All</option>
+  <option value="Blocked">Blocked</option>
+  <option value="Not Started">Not Started</option>
+  <option value="In Progress">In Progress</option>
+  <option value="Completion Request">Completion Request</option>
+  <option value="Completed">Completed</option>
+</select>
     <select id="viewFilter">
       <option value="Cards">Cards</option>
       <option value="Table">Table</option>
@@ -518,6 +519,8 @@
     </button>
     <input type="text" id="searchBox" placeholder="Search tasks..." />
   </div>
+<!-- Status Filter Dropdown -->
+
 </div>
 
 <div id="editTaskPopup" class="popup-overlay" style="display: none;">
@@ -525,7 +528,6 @@
     <h3>Edit Task</h3>
     <form id="editTaskForm">
       <div class="edit-grid">
-        <!-- (your form fields here, unchanged) -->
         <div>
           <label>Description:</label>
           <input type="text" id="editDescription" />
@@ -595,16 +597,21 @@
 <div id="task-container"></div>
    
 <script>
+
 function showToast(type, title, message) {
     const toastContainer = document.getElementById("toast-container");
+
     const toast = document.createElement("div");
     toast.className = `toast ${type}`;
+
     const toastTitle = document.createElement("div");
     toastTitle.className = "toast-title";
     toastTitle.textContent = title;
+
     const toastMessage = document.createElement("div");
     toastMessage.className = "toast-message";
     toastMessage.textContent = message;
+
     const closeButton = document.createElement("button");
     closeButton.className = "toast-close";
     closeButton.textContent = "×";
@@ -612,16 +619,24 @@ function showToast(type, title, message) {
         toast.style.animation = "none";
         toast.remove();
     };
+
     toast.appendChild(toastTitle);
     toast.appendChild(toastMessage);
     toast.appendChild(closeButton);
+
     toastContainer.appendChild(toast);
+
     setTimeout(() => {
         if (toast.parentNode) {
             toast.remove();
         }
     }, 5000);
 }
+
+ function handleStatusDropdownChange(selectedStatus) {
+	  currentStatus = selectedStatus;
+	  renderTasks();
+	} 
 
 let tasks = [];
 let currentView = "Cards";
@@ -631,58 +646,65 @@ let fullDetailsPage = 1;
 let tablePage = 1;
 const pageSize = 10;
 
-// This function will always fetch and render tasks
 async function fetchTasks() {
   try {
     const res = await fetch("/api/manager/allTask");
-    const data = await res.json();
-    console.log('Fetched tasks:', data); // Debugging!
-    tasks = Array.isArray(data) ? data : [];
+    tasks = await res.json();
     renderTasks();
   } catch (err) {
     console.error("Error fetching tasks:", err);
-    showToast('error', '❌ Fetch Error', "Could not load tasks from the server.");
-    tasks = [];
-    renderTasks();
   }
 }
 
 //Helper: returns HTML for pagination controls
 function renderPagination(page, pageCount, onPage) {
-  let html = '';
-  if (pageCount <= 1) return "";
-  function pageBtn(num, active) {
-    return `<button class="pagination-btn${active ? " active" : ""}" data-page="${num}"${active ? ' tabindex="0"' : ''}>${num}</button>`;
-  }
-  html += pageBtn(1, page === 1);
-  if (page > 3) html += `<span class="pagination-ellipsis">…</span>`;
-  for (let i = Math.max(2, page - 1); i <= Math.min(pageCount - 1, page + 1); i++) {
-    if (i === 1 || i === pageCount) continue;
-    html += pageBtn(i, i === page);
-  }
-  if (page < pageCount - 2) html += `<span class="pagination-ellipsis">…</span>`;
-  if (pageCount > 1) html += pageBtn(pageCount, page === pageCount);
-  html = `
-    <button class="pagination-btn" data-page="prev" ${page === 1 ? "disabled" : ""}>&laquo;</button>
-    ${html}
-    <button class="pagination-btn" data-page="next" ${page === pageCount ? "disabled" : ""}>&raquo;</button>
-  `;
-  return `<div class="pagination-container">${html}</div>`;
+// Page numbers logic (show always first, last, current, +/-1, use ellipsis if gap)
+let html = '';
+if (pageCount <= 1) return ""; // Don't show if only one page
+
+function pageBtn(num, active) {
+ return `<button class="pagination-btn${active ? " active" : ""}" data-page="${num}"${active ? ' tabindex="0"' : ''}>${num}</button>`;
 }
+
+// Always show first page
+html += pageBtn(1, page === 1);
+
+// Show ... if needed
+if (page > 3) html += `<span class="pagination-ellipsis">…</span>`;
+
+// Show previous, current, next (excluding first/last)
+for (let i = Math.max(2, page - 1); i <= Math.min(pageCount - 1, page + 1); i++) {
+ if (i === 1 || i === pageCount) continue;
+ html += pageBtn(i, i === page);
+}
+
+// Show ... if needed
+if (page < pageCount - 2) html += `<span class="pagination-ellipsis">…</span>`;
+
+// Always show last page if more than one
+if (pageCount > 1) html += pageBtn(pageCount, page === pageCount);
+
+// Prev & Next
+html = `
+ <button class="pagination-btn" data-page="prev" ${page === 1 ? "disabled" : ""}>&laquo;</button>
+ ${html}
+ <button class="pagination-btn" data-page="next" ${page === pageCount ? "disabled" : ""}>&raquo;</button>
+`;
+return `<div class="pagination-container">${html}</div>`;
+}
+
 
 function renderTasks() {
   const container = document.getElementById("task-container");
-  if (!Array.isArray(tasks) || tasks.length === 0) {
-    container.innerHTML = `<div style="padding:1rem">No tasks available.</div>`;
-    return;
-  }
 
   // Filter out empty/invalid task objects
   let filtered = tasks
     .filter(t => t && Object.keys(t).length > 0 && t.description)
     .filter(t => {
+      // Safely handle undefined or null status
       const taskStatus = t.status ? t.status.toLowerCase() : "";
       const filterStatus = currentStatus === "All" ? "" : currentStatus.toLowerCase();
+      
       return (
         (currentStatus === "All" || taskStatus === filterStatus) &&
         (!searchQuery ||
@@ -692,11 +714,6 @@ function renderTasks() {
         )
       );
     });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div style="padding:1rem">No tasks match your filter.</div>`;
-    return;
-  }
 
   if (currentView === "Cards") {
     container.innerHTML = filtered.map(task => `
@@ -721,59 +738,63 @@ function renderTasks() {
       </div>
     `).join("");
   } else if (currentView === "Table") {
-    const pageCount = Math.ceil(filtered.length / pageSize);
-    if (tablePage > pageCount) tablePage = pageCount > 0 ? pageCount : 1;
-    const startIdx = (tablePage - 1) * pageSize;
-    const endIdx = startIdx + pageSize;
-    const paginated = filtered.slice(startIdx, endIdx);
+	  
+	// Table pagination
+	    const pageCount = Math.ceil(filtered.length / pageSize);
+	    if (tablePage > pageCount) tablePage = pageCount > 0 ? pageCount : 1;
+	    const startIdx = (tablePage - 1) * pageSize;
+	    const endIdx = startIdx + pageSize;
+	    const paginated = filtered.slice(startIdx, endIdx);
 
-    container.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-          <th>Task No.</th> <th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Storypoints</th><th>Start Date</th><th>Due Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${paginated.map(task => `
-            <tr class="priority-${task.priority?.toLowerCase() || 'none'}">
-              <td>${task.id}</td>
-              <td>${task.description}</td>
-              <td>${task.department}</td>
-              <td>${task.status}</td>
-              <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
-              <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
-              <td>${task.start_date ||'-'}</td>
-              <td>${task.end_date ||'-'}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-      ${renderPagination(tablePage, pageCount)}
-    `;
+	    container.innerHTML = `
+	      <table>
+	        <thead>
+	          <tr>
+	          <th>Task No.</th> <th>Description</th><th>Department</th><th>Status</th><th>Priority</th><th>Storypoints</th><th>Start Date</th><th>Due Date</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          ${paginated.map(task => `
+	            <tr class="priority-${task.priority?.toLowerCase() || 'none'}">
+	              <td>${task.id}</td>
+	              <td>${task.description}</td>
+	              <td>${task.department}</td>
+	              <td>${task.status}</td>
+	              <td><span class="tag priority ${task.priority?.toLowerCase() || ''}">${task.priority || '-'}</span></td>
+	              <td>${task.storypoints == null || task.storypoints == 0 ? '-' : task.storypoints}</td>
+	              <td>${task.start_date ||'-'}</td>
+	              <td>${task.end_date ||'-'}</td>
+	            </tr>
+	          `).join("")}
+	        </tbody>
+	      </table>
+	      ${renderPagination(tablePage, pageCount, (p) => { tablePage = p; renderTasks(); })}
+	    `;
 
-    // Pagination event listeners
-    document.querySelectorAll(".pagination-btn").forEach(btn => {
-      btn.onclick = function() {
-        let pageAttr = this.getAttribute("data-page");
-        if (pageAttr === "prev") {
-          if (tablePage > 1) tablePage--;
-        } else if (pageAttr === "next") {
-          if (tablePage < pageCount) tablePage++;
-        } else {
-          tablePage = Number(pageAttr);
-        }
-        renderTasks();
-      };
-    }); 
+	    // Pagination event listeners
+	    document.querySelectorAll(".pagination-btn").forEach(btn => {
+	      btn.onclick = function() {
+	        let pageAttr = this.getAttribute("data-page");
+	        if (pageAttr === "prev") {
+	          if (tablePage > 1) tablePage--;
+	        } else if (pageAttr === "next") {
+	          if (tablePage < pageCount) tablePage++;
+	        } else {
+	          tablePage = Number(pageAttr);
+	        }
+	        renderTasks();
+	      };
+	    }); 
+	    
   } else {
-    // Full Details view
-    const pageCount = Math.ceil(filtered.length / pageSize);
-    if (fullDetailsPage > pageCount) fullDetailsPage = pageCount > 0 ? pageCount : 1;
-    const startIdx = (fullDetailsPage - 1) * pageSize;
-    const endIdx = startIdx + pageSize;
-    const paginated = filtered.slice(startIdx, endIdx);
-
+	  
+	// PAGINATION for Full Details
+	    const pageCount = Math.ceil(filtered.length / pageSize);
+	    if (fullDetailsPage > pageCount) fullDetailsPage = pageCount > 0 ? pageCount : 1;
+	    const startIdx = (fullDetailsPage - 1) * pageSize;
+	    const endIdx = startIdx + pageSize;
+	    const paginated = filtered.slice(startIdx, endIdx);
+	    
     container.innerHTML = `
       <table>
         <thead>
@@ -810,9 +831,13 @@ function renderTasks() {
           `).join("")}
         </tbody>
       </table>
-      ${renderPagination(fullDetailsPage, pageCount)}
+      
+      ${renderPagination(fullDetailsPage, pageCount, (p) => { fullDetailsPage = p; renderTasks(); })}
+      
     `;
+    
 
+    // Pagination event listeners
     document.querySelectorAll(".pagination-btn").forEach(btn => {
       btn.onclick = function() {
         let pageAttr = this.getAttribute("data-page");
@@ -826,37 +851,39 @@ function renderTasks() {
         renderTasks();
       };
     });
+    
   }
 }
 
-// View and filter controls
-document.getElementById("viewFilter").addEventListener("change", (e) => {
-  currentView = e.target.value;
-  if (currentView === "Full Details") fullDetailsPage = 1;
-  if (currentView === "Table") tablePage = 1;
-  renderTasks();
-});
-document.getElementById("searchBox").addEventListener("input", (e) => {
-  searchQuery = e.target.value;
-  if (currentView === "Full Details") fullDetailsPage = 1;
-  if (currentView === "Table") tablePage = 1;
-  renderTasks();
-});
-document.getElementById('statusDropdown').addEventListener('change', function() {
-  currentStatus = this.value;
-  if (currentView === "Full Details") fullDetailsPage = 1;
-  if (currentView === "Table") tablePage = 1;
-  renderTasks();
-}); 
+ document.getElementById("viewFilter").addEventListener("change", (e) => {
+	  currentView = e.target.value;
+	  if (currentView === "Full Details") fullDetailsPage = 1;
+	  if (currentView === "Table") tablePage = 1;
+	  renderTasks();
+	});
+	document.getElementById("searchBox").addEventListener("input", (e) => {
+	  searchQuery = e.target.value;
+	  if (currentView === "Full Details") fullDetailsPage = 1;
+	  if (currentView === "Table") tablePage = 1;
+	  renderTasks();
+	});
+	document.getElementById('statusDropdown').addEventListener('change', function() {
+		  currentStatus = this.value;
+		  if (currentView === "Full Details") fullDetailsPage = 1;
+		  if (currentView === "Table") tablePage = 1;
+		  renderTasks();
+		}); 
 
 document.getElementById("exportBtn").addEventListener("click", () => {
   const rows = [["Description", "Status", "Priority", "Points", "Due Date"]];
   tasks.forEach(task => {
     rows.push([task.description, task.status, task.priority || "", task.storypoints, task.end_date]);
   });
+
   const csv = rows.map(r => r.map(value => `"${value}"`).join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement("a");
   a.href = url;
   a.download = "tasks_export.csv";
@@ -868,115 +895,139 @@ document.getElementById("exportBtn").addEventListener("click", () => {
 
 let currentEditTaskIndex = null;
 
+//Open the edit task popup and prefill the form
 function openEditTaskPopup(index) {
-  currentEditTaskIndex = tasks.findIndex(task => task.id == index);
-  const task = tasks[currentEditTaskIndex];
-  document.getElementById('editDescription').value = task.description || '';
-  document.getElementById('editDepartment').value = task.department || '';
-  document.getElementById('editArea').value = task.area || '';
-  document.getElementById('editSubarea').value = task.sub_area || '';
-  document.getElementById('editPerson').value = task.person || '';
-  document.getElementById('editStartDate').value = task.start_date || '';
-  document.getElementById('editEndDate').value = task.end_date || '';
-  document.getElementById('editStorypoints').value = task.storypoints || '';
-  document.getElementById('editStatus').value = task.status || '';
-  document.getElementById('editCompletionDate').value = task.completion_date || '';
-  document.getElementById('editPriority').value = task.priority || '';
-  document.getElementById('editBottlenecks').value = task.bottlenecks || '';
-  document.getElementById('editRemarks').value = task.remarks || '';
-  document.getElementById('editTaskPopup').style.display = 'flex';
+currentEditTaskIndex = tasks.findIndex(task => task.id == index);
+const task = tasks[currentEditTaskIndex];
+
+document.getElementById('editDescription').value = task.description || '';
+document.getElementById('editDepartment').value = task.department || '';
+document.getElementById('editArea').value = task.area || '';
+document.getElementById('editSubarea').value = task.sub_area || '';
+document.getElementById('editPerson').value = task.person || '';
+document.getElementById('editStartDate').value = task.start_date || '';
+document.getElementById('editEndDate').value = task.end_date || '';
+document.getElementById('editStorypoints').value = task.storypoints || '';
+document.getElementById('editStatus').value = task.status || '';
+document.getElementById('editCompletionDate').value = task.completion_date || '';
+document.getElementById('editPriority').value = task.priority || '';
+document.getElementById('editBottlenecks').value = task.bottlenecks || '';
+document.getElementById('editRemarks').value = task.remarks || '';
+
+document.getElementById('editTaskPopup').style.display = 'flex';
 }
 
+//Close the edit task popup
 function closeEditTaskPopup() {
-  document.getElementById('editTaskPopup').style.display = 'none';
+document.getElementById('editTaskPopup').style.display = 'none';
 }
 
+//Handle task edit form submission
 document.getElementById('editTaskForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-  if (currentEditTaskIndex === null) return;
-  const form = this;
-  const submitBtn = form.querySelector('.btn-submit');
-  const originalText = submitBtn.innerText;
-  submitBtn.disabled = true;
-  submitBtn.innerText = "Updating...";
-  const status = document.getElementById('editStatus').value;
-  let completionDate = document.getElementById('editCompletionDate').value;
-  if (status === 'Completed' && !completionDate) {
-    const today = new Date().toISOString().split('T')[0];
-    completionDate = today;
-    document.getElementById('editCompletionDate').value = today;
-  }
-  const updatedTask = {
-    ...tasks[currentEditTaskIndex],
-    description: document.getElementById('editDescription').value,
-    department: document.getElementById('editDepartment').value,
-    area: document.getElementById('editArea').value,
-    sub_area: document.getElementById('editSubarea').value,
-    person: document.getElementById('editPerson').value,
-    start_date: document.getElementById('editStartDate').value,
-    end_date: document.getElementById('editEndDate').value,
-    storypoints: document.getElementById('editStorypoints').value,
-    status: status,
-    completion_date: completionDate,
-    priority: document.getElementById('editPriority').value,
-    bottlenecks: document.getElementById('editBottlenecks').value,
-    remarks: document.getElementById('editRemarks').value
-  };
-  tasks[currentEditTaskIndex] = updatedTask;
-  fetch(`/api/manager/updateTask/${updatedTask.id}`, {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(updatedTask)
-  })
-  .then(response => {
-    if (!response.ok) throw new Error("Failed to update task");
-    return response.text();
-  })
-  .then(data => {
-    showToast('success', '✅ Task Updated', 'Task updated successfully.');
-    closeEditTaskPopup();
-    fetchTasks(); // Reload with up-to-date data!
-  })
-  .catch(error => {
-    console.error("Error updating task:", error);
-    showToast('error', '❌ Update Failed', 'Failed to update task.');
-  })
-  .finally(() => {
-    submitBtn.disabled = false;
-    submitBtn.innerText = originalText;
-  });
+e.preventDefault();
+if (currentEditTaskIndex === null) return;
+
+const form = this;
+const submitBtn = form.querySelector('.btn-submit');
+const originalText = submitBtn.innerText;
+
+// Disable button and show loading text
+submitBtn.disabled = true;
+submitBtn.innerText = "Updating...";
+
+const status = document.getElementById('editStatus').value;
+let completionDate = document.getElementById('editCompletionDate').value;
+
+// Automatically set completion date if status is "Completed"
+if (status === 'Completed' && !completionDate) {
+ const today = new Date().toISOString().split('T')[0];
+ completionDate = today;
+ document.getElementById('editCompletionDate').value = today;
+}
+
+const updatedTask = {
+ ...tasks[currentEditTaskIndex],
+ description: document.getElementById('editDescription').value,
+ department: document.getElementById('editDepartment').value,
+ area: document.getElementById('editArea').value,
+ sub_area: document.getElementById('editSubarea').value,
+ person: document.getElementById('editPerson').value,
+ start_date: document.getElementById('editStartDate').value,
+ end_date: document.getElementById('editEndDate').value,
+ storypoints: document.getElementById('editStorypoints').value,
+ status: status,
+ completion_date: completionDate,
+ priority: document.getElementById('editPriority').value,
+ bottlenecks: document.getElementById('editBottlenecks').value,
+ remarks: document.getElementById('editRemarks').value
+};
+
+tasks[currentEditTaskIndex] = updatedTask;
+
+fetch(`/api/manager/updateTask/${updatedTask.id}`, {
+ method: 'PUT',
+ headers: {
+   'Content-Type': 'application/json'
+ },
+ body: JSON.stringify(updatedTask)
+})
+ .then(response => {
+   if (!response.ok) throw new Error("Failed to update task");
+   return response.text();
+ })
+ .then(data => {
+   showToast('success', '✅ Task Updated', 'Task updated successfully.');
+   closeEditTaskPopup();
+   renderTasks();
+ })
+ .catch(error => {
+   console.error("Error updating task:", error);
+   showToast('error', '❌ Update Failed', 'Failed to update task.');
+ })
+ .finally(() => {
+   submitBtn.disabled = false;
+   submitBtn.innerText = originalText;
+ });
 });
 
-async function confirmDeleteTask(taskId) {
-  const result = await Swal.fire({
-    title: `Delete Task ID: ${taskId}?`,
-    text: "This action cannot be undone.",
-    icon: 'warning',
-    width: '400px', 
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel'
-  });
-  if (!result.isConfirmed) return;
-  try {
-    const response = await fetch(`/api/manager/delete/${taskId}`, { method: 'DELETE' });
-    const result = await response.text();
-    if (response.ok) {
-      showToast('success', '✅ Task Deleted', "Task Deleted Successfully");
-      fetchTasks(); // refresh task list
-    } else {
-      showToast('error', '❌ Delete Failed', "Failed To Delete Task");
-    }
-  } catch (err) {
-    console.error('Delete error:', err);
-    showToast('error', '❌ Delete Error', "An Error Occured While Deleting The Task");
-  }
-}
+//Call this function initially to load tasks
+fetchTasks();
 
-// Ensure tasks are loaded on initial page load
-window.addEventListener('DOMContentLoaded', fetchTasks);
+
+	  async function confirmDeleteTask(taskId) {
+		  const result = await Swal.fire({
+		    title: `Delete Task ID: ${taskId}?`,
+		    text: "This action cannot be undone.",
+		    icon: 'warning',
+		    width: '400px', 
+		    showCancelButton: true,
+		    confirmButtonColor: '#d33',
+		    cancelButtonColor: '#3085d6',
+		    confirmButtonText: 'Yes, delete it!',
+		    cancelButtonText: 'Cancel'
+		  });
+
+		  if (!result.isConfirmed) return;
+
+	  try {
+	    const response = await fetch(`/api/manager/delete/${taskId}`, {
+	      method: 'DELETE'
+	    });
+
+	    const result = await response.text();
+
+	    if (response.ok) {
+	      showToast('success', '✅ Task Deleted', "Task Deleted Successfully");
+	      fetchTasks(); // refresh task list
+	    } else {
+	      showToast('error', '❌ Delete Failed', "Failed To Delete Task");
+	    }
+	  } catch (err) {
+	    console.error('Delete error:', err);
+	    showToast('error', '❌ Delete Error', "An Error Occured While Deleting The Task");
+	  }
+	}
+
 </script> 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
