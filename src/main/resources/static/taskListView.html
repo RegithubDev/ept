@@ -638,23 +638,29 @@ function showToast(type, title, message) {
 	  renderTasks();
 	} 
 
-let tasks = [];
-let currentView = "Cards";
-let currentStatus = "All";
-let searchQuery = "";
-let fullDetailsPage = 1;
-let tablePage = 1;
-const pageSize = 10;
+ let tasks = [];
+ let currentView = "Cards";
+ let currentStatus = "All";
+ let searchQuery = "";
+ let fullDetailsPage = 1;
+ let tablePage = 1;
+ const pageSize = 10;
 
-async function fetchTasks() {
-  try {
-    const res = await fetch("/api/manager/allTask");
-    tasks = await res.json();
-    renderTasks();
-  } catch (err) {
-    console.error("Error fetching tasks:", err);
-  }
-}
+ async function fetchTasks() {
+   try {
+     const res = await fetch("/api/manager/allTasks");
+     tasks = await res.json();
+     renderTasks();
+   } catch (err) {
+     console.error("Error fetching tasks:", err);
+     console.error("Error fetching tasks:", err);
+     showToast('error', '❌ Fetch Error', "Could not load tasks from the server.");
+     tasks = [];
+     renderTasks();
+     
+   }
+ }
+
 
 //Helper: returns HTML for pagination controls
 function renderPagination(page, pageCount, onPage) {
