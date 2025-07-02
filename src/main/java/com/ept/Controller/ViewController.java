@@ -59,4 +59,11 @@ public class ViewController {
 	    	
 	    }
 
+ @GetMapping("/Allempscore")
+	    public String Allempscore() {
+	    	return "forward:/Allempscore.html";
+	    	
+	    }
+
+	
 }
