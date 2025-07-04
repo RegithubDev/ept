@@ -1294,67 +1294,66 @@ document.getElementById('dashboardMenuLink').addEventListener('click', function 
 
    startAutoRefresh();
  });
+async function fetchTasks() {
+  try {
+    const email = localStorage.getItem("EmpEmail");
+    if (!email) {
+      showToast('error', '❌ No Email', 'No employee email found in localStorage');
+      return;
+    }
+    const response = await fetch(`/api/employee/tasks/${email}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+    }
+    tasksInfo = await response.json();
+    console.log('Fetched Tasks:', tasksInfo);
 
- async function fetchTasks() {
-   try {
-     const response = await fetch(`/api/employee/tasks/${localStorage.getItem("EmpEmail")}`);
-     if (!response.ok) throw new Error('Failed to fetch tasks');
+    const totalTasks = tasksInfo.length;
+    const completedTasks = tasksInfo.filter(task => task.status === "Completed").length;
+    const notStartedTasks = tasksInfo.filter(task => task.status === "Not Started").length;
+    const inProgressTasks = tasksInfo.filter(task => task.status === "In Progress").length;
 
-     tasksInfo = await response.json();
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
 
-     // Compute statistics
-     const totalTasks = tasksInfo.length;
-     const completedTasks = tasksInfo.filter(task => task.status === "Completed").length;
-     const notStartedTasks = tasksInfo.filter(task => task.status === "Not Started").length;
-     const inProgressTasks = tasksInfo.filter(task => task.status === "In Progress").length;
+    const weeklyTasks = tasksInfo.filter(task => {
+      const taskStartDate = new Date(task.start_date);
+      return taskStartDate >= startOfWeek && taskStartDate <= endOfWeek;
+    });
+    const weeklyTotalTasks = weeklyTasks.length;
+    const weeklyCompletedTasks = weeklyTasks.filter(task => task.status === "Completed").length;
+    const weeklyCompletionPercentage = weeklyTotalTasks > 0 ? (weeklyCompletedTasks / weeklyTotalTasks) * 100 : 0;
 
-     // Calculate weekly goals
-     const today = new Date();
-     const startOfWeek = new Date(today);
-     startOfWeek.setDate(today.getDate() - today.getDay()); // Start of current week (Sunday)
-     startOfWeek.setHours(0, 0, 0, 0);
-     const endOfWeek = new Date(startOfWeek);
-     endOfWeek.setDate(startOfWeek.getDate() + 6); // End of current week (Saturday)
-     endOfWeek.setHours(23, 59, 59, 999);
+    document.getElementById("totalTasks").textContent = totalTasks;
+    document.getElementById("completedTasks").textContent = completedTasks;
+    document.getElementById("notStartedTasks").textContent = notStartedTasks;
+    document.getElementById("InProgressTasks").textContent = inProgressTasks;
 
-     const weeklyTasks = tasksInfo.filter(task => {
-       const taskStartDate = new Date(task.start_date);
-       return taskStartDate >= startOfWeek && taskStartDate <= endOfWeek;
-     });
-     const weeklyTotalTasks = weeklyTasks.length;
-     const weeklyCompletedTasks = weeklyTasks.filter(task => task.status === "Completed").length;
-     const weeklyCompletionPercentage = weeklyTotalTasks > 0 ? (weeklyCompletedTasks / weeklyTotalTasks) * 100 : 0;
+    const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+    if (completionChart) {
+      completionChart.data.datasets[0].data = [completionPercentage, 100 - completionPercentage];
+      completionChart.update();
+    }
+    document.getElementById('completionLabel').textContent = `${completionPercentage.toFixed(1)}% Complete`;
 
-     // Update main dashboard cards
-     document.getElementById("totalTasks").textContent = totalTasks;
-     document.getElementById("completedTasks").textContent = completedTasks;
-     document.getElementById("notStartedTasks").textContent = notStartedTasks;
-     document.getElementById("InProgressTasks").textContent = inProgressTasks;
+    document.getElementById('weeklyGoalsBar').style.width = `${weeklyCompletionPercentage}%`;
+    document.getElementById('weeklyGoalsLabel').textContent = `${weeklyCompletionPercentage.toFixed(1)}% of Weekly Goals`;
 
-     // Update the new summary cards
-     // Completion Progress (circular)
-     const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-     if (completionChart) {
-       completionChart.data.datasets[0].data = [completionPercentage, 100 - completionPercentage];
-       completionChart.update();
-     }
-     document.getElementById('completionLabel').textContent = `${completionPercentage.toFixed(1)}% Complete`;
-
-     // Weekly Goals (bar)
-     document.getElementById('weeklyGoalsBar').style.width = `${weeklyCompletionPercentage}%`;
-     document.getElementById('weeklyGoalsLabel').textContent = `${weeklyCompletionPercentage.toFixed(1)}% of Weekly Goals`;
-
-     // Task Status Breakdown
-     if (taskChart) {
-       taskChart.data.datasets[0].data = [completedTasks, inProgressTasks, notStartedTasks];
-       taskChart.update();
-     }
-
-   } catch (error) {
-     console.error("Error fetching tasks:", error);
-     tasksInfo = [];
-   }
- }
+    if (taskChart) {
+      taskChart.data.datasets[0].data = [completedTasks, inProgressTasks, notStartedTasks];
+      taskChart.update();
+    }
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    showToast('error', '❌ Fetch Error', `Failed to load tasks: ${error.message}`);
+    tasksInfo = [];
+  }
+}
 
  
 function startAutoRefresh() {
