@@ -426,6 +426,8 @@
   border-color: #999;
 }
 
+
+
 .gradient-header {
       background: linear-gradient(90deg, #77c1c9 0%, #7ce7508c 100%);
       padding: 1rem;
@@ -482,12 +484,13 @@
       user-select: none;
     }
     
+    
   </style>  
 </head>
 <body>
 
 <div id="toast-container" class="toast-container"></div>
-    
+
   <header class="gradient-header">
   <div style="display: flex; align-items: center; gap: 0.5rem;">
   
@@ -637,30 +640,23 @@ function showToast(type, title, message) {
 	  currentStatus = selectedStatus;
 	  renderTasks();
 	} 
+let tasks = [];
+let currentView = "Cards";
+let currentStatus = "All";
+let searchQuery = "";
+let fullDetailsPage = 1;
+let tablePage = 1;
+const pageSize = 10;
 
- let tasks = [];
- let currentView = "Cards";
- let currentStatus = "All";
- let searchQuery = "";
- let fullDetailsPage = 1;
- let tablePage = 1;
- const pageSize = 10;
-
- async function fetchTasks() {
-   try {
-     const res = await fetch("/api/manager/allTasks");
-     tasks = await res.json();
-     renderTasks();
-   } catch (err) {
-     console.error("Error fetching tasks:", err);
-     console.error("Error fetching tasks:", err);
-     showToast('error', '❌ Fetch Error', "Could not load tasks from the server.");
-     tasks = [];
-     renderTasks();
-     
-   }
- }
-
+async function fetchTasks() {
+  try {
+    const res = await fetch("/api/manager/allTasks");
+    tasks = await res.json();
+    renderTasks();
+  } catch (err) {
+    console.error("Error fetching tasks:", err);
+  }
+}
 
 //Helper: returns HTML for pagination controls
 function renderPagination(page, pageCount, onPage) {
@@ -1000,6 +996,10 @@ fetch(`/api/manager/updateTask/${updatedTask.id}`, {
 fetchTasks();
 
 
+/* async function confirmDeleteTask(taskId) {
+	  if (!confirm(`Are you sure you want to delete Task ID: ${taskId}? This cannot be undone.`)) {
+	    return;
+	  } */
 	  async function confirmDeleteTask(taskId) {
 		  const result = await Swal.fire({
 		    title: `Delete Task ID: ${taskId}?`,
